@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翼型工程数据可视化分析报告</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans SC', -apple-system, sans-serif;
+    background: #f5f7fa;
+    color: #1a2332;
+    padding: 0;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 100%);
+    color: white;
+    padding: 48px 64px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: 0.03em; }
+  .header p { margin-top: 12px; font-size: 14px; color: rgba(255,255,255,0.6); font-weight: 300; }
+  .header .stats { display: flex; gap: 32px; margin-top: 24px; }
+  .header .stat-item { text-align: center; }
+  .header .stat-num { font-size: 24px; font-weight: 700; color: #4fc3f7; }
+  .header .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-size: 22px; font-weight: 600; margin-bottom: 8px;
+    padding-left: 16px; border-left: 4px solid #2980b9;
+  }
+  .section-desc { font-size: 14px; color: #666; margin-bottom: 24px; line-height: 1.7; font-weight: 300; }
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .chart-card img { width: 100%; display: block; }
+  .chart-card .caption { padding: 16px 20px; font-size: 13px; color: #555; line-height: 1.6; border-top: 1px solid #f0f0f0; }
+  .chart-card .caption strong { color: #1a2332; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .footer {
+    text-align: center; padding: 32px;
+    font-size: 13px; color: #999; border-top: 1px solid #eee;
+    margin-top: 48px;
+  }
+  @media (max-width: 768px) {
+    .header { padding: 32px 24px; }
+    .header .stats { flex-wrap: wrap; gap: 16px; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>翼型工程数据可视化分析报告</h1>
+  <p>面向数据智能协同的翼型工程数据库系统 — 数据探索阶段</p>
+  <div class="stats">
+    <div class="stat-item"><div class="stat-num">100</div><div class="stat-label">翼型总数</div></div>
+    <div class="stat-item"><div class="stat-num">10,011</div><div class="stat-label">总坐标点数</div></div>
+    <div class="stat-item"><div class="stat-num">18,060</div><div class="stat-label">性能记录数</div></div>
+    <div class="stat-item"><div class="stat-num">107</div><div class="stat-label">Polar 目录数</div></div>
+    <div class="stat-item"><div class="stat-num">129</div><div class="stat-label">异常记录</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 图表1 -->
+  <div class="section">
+    <h2 class="section-title">1. 翼型轮廓对比</h2>
+    <p class="section-desc">5 个代表性 NACA 翼型的形状轮廓叠加，展示不同弯度和厚度对翼型几何的影响。对称翼型（0006、0015）上下对称，而有弯度翼型（2412、4421）中弧线弯曲明显。标注了各翼型的最大厚度比 t（以弦长百分比表示）。</p>
+    <div class="chart-card">
+      <img src="01_foil_profiles.png" alt="翼型轮廓对比图">
+      <div class="caption">
+        <strong>分析要点：</strong>NACA 四位数字翼型中，厚度从 6%（0006）到 21%（4421）变化；弯度从 0%（对称）到 4%（4421）。翼型轮廓直接影响气动特性——厚度提供结构空间但增加阻力，弯度提升最大升力系数。
+      </div>
+    </div>
+  </div>
+
+  <!-- 图表2 -->
+  <div class="section">
+    <h2 class="section-title">2. 升力系数 Cl — 攻角 α 关系</h2>
+    <p class="section-desc">三种代表性翼型（NACA 2412、0006、4421）在不同雷诺数（Re=0.050M/0.070M/0.100M）条件下的升力系数曲线。Cl-α 曲线的斜率反映了翼型的升力效率，失速点则体现其最大升力能力。</p>
+    <div class="chart-card">
+      <img src="02_cl_alpha_multi_re.png" alt="Cl-α 多Re曲线">
+      <div class="caption">
+        <strong>关键发现：</strong>有弯度翼型（NACA 2412、4421）的 Cl 值整体高于对称翼型（0006）。Re 增大时，升力线斜率略微增加。所有翼型在攻角约 14° 后出现失速，Cl 开始下降。
+      </div>
+    </div>
+  </div>
+
+  <!-- 图表3 -->
+  <div class="section">
+    <h2 class="section-title">3. 阻力系数 Cd 与升阻比分析</h2>
+    <p class="section-desc">翼型阻力系数和升阻比的多维度分析，包括多翼型 Cd-α 对比、升阻比 Cl/Cd-α 曲线、以及 NACA 2412 在不同 Re 下的性能变化。</p>
+    <div class="chart-card">
+      <img src="03_cd_and_ld.png" alt="Cd和升阻比分析">
+      <div class="caption">
+        <strong>关键发现：</strong>对称翼型 NACA 0006 阻力最低但升力也最低；有弯度翼型 NACA 4421 升力最高但阻力也最大。升阻比曲线显示每个翼型都有一个最佳攻角范围（约 3°-8°），此时气动效率最高。Re 对阻力影响明显——高 Re 下零升阻力降低。
+      </div>
+    </div>
+  </div>
+
+  <!-- 图表4 -->
+  <div class="section">
+    <h2 class="section-title">4. 多翼型性能对比</h2>
+    <p class="section-desc">5 种代表性翼型在相同 Re（0.070M）条件下的综合性能对比，涵盖升力、阻力和升阻比三方面。</p>
+    <div class="chart-card">
+      <img src="04_multi_foil_comparison.png" alt="多翼型性能对比">
+      <div class="caption">
+        <strong>工程意义：</strong>选择翼型需要在升力、阻力和效率之间权衡——对称翼型（0006）适合高速低阻场景，有弯度翼型（2412、4421）适合需要高升力的起降场景。NACA 0015 和 4415 在中等厚度下提供了较好的折中方案。
+      </div>
+    </div>
+  </div>
+
+  <!-- 图表5 -->
+  <div class="section">
+    <h2 class="section-title">5. 异常数据检测</h2>
+    <p class="section-desc">系统注入的异常数据可视化分析。通过规则检测方法（Cd&lt;0、|Cl|&gt;3.0、Cd 异常偏低）识别异常记录，展示异常在 Cl-Cd 空间中的分布特征。</p>
+    <div class="chart-card">
+      <img src="05_anomaly_detection.png" alt="异常数据检测">
+      <div class="caption">
+        <strong>异常类型说明：</strong><br>
+        <span style="color:#d62728">■ negative_cd</span> — 阻力系数为负值（物理不可能）<br>
+        <span style="color:#ff7f0e">■ extreme_cl</span> — 升力系数异常偏高（>3.0，远超物理极限）<br>
+        <span style="color:#2ca02c">■ extreme_ld</span> — 升阻比异常偏离（Cd 异常偏低导致）<br>
+        以 NACA 0006 在 Re=0.050M 条件下的 Cl-α 和 Cd-α 曲线为例，红色标记点即为注入的异常数据点。
+      </div>
+    </div>
+  </div>
+
+  <!-- 图表6 -->
+  <div class="section">
+    <h2 class="section-title">6. 数据规模总览</h2>
+    <p class="section-desc">整体数据集的全面统计与分布展示，包括翼型类别分布、坐标点数分布、性能记录数分布、Cl 热力图、数据规模和异常检测结果。</p>
+    <div class="chart-card">
+      <img src="06_data_overview.png" alt="数据规模总览">
+      <div class="caption">
+        <strong>数据完整性：</strong>翼型覆盖对称/有弯度/5位系列/6系7系四大类别；所有翼型坐标点数≥100，远超项目要求的 80 点；每个翼型生成约 153 条性能记录，覆盖 3 个 Re 条件。异常数据共 129 条，占总数约 0.7%。
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  翼型工程数据库系统 · 数据可视化分析报告 · 生成于数据分析阶段
+</div>
+</body>
+</html>
