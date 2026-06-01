@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "P01",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA0012 的当前有效版本号与创建时间。",
+      "gold_sql": "SELECT airfoil_code, version_no, created_at\nFROM api.v_current_airfoil_version\nWHERE airfoil_code = 'NACA0012'\nLIMIT 1",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P02",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA0012 的当前有效版本上表面坐标点，按点序排序，返回前 20 个点。",
+      "gold_sql": "SELECT surface, point_order, x, y\nFROM api.get_airfoil_geometry('NACA0012', true, NULL)\nWHERE surface = 'upper'\nORDER BY point_order\nLIMIT 20",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P03",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "在 Re=3000000、攻角 α=2 条件下，列出升阻比最高的前 10 个翼型（只看当前有效版本）。",
+      "gold_sql": "SELECT airfoil_code, name, version_no, cl, cd, l_over_d\nFROM api.find_airfoils_by_condition(2, 3000000, NULL, NULL, NULL, true)\nORDER BY l_over_d DESC NULLS LAST\nLIMIT 10",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P04",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA2412 在 Re=3000000 下不同攻角的 Cl、Cd 曲线点，按攻角升序。",
+      "gold_sql": "SELECT airfoil_code, alpha_deg, cl, cd, l_over_d\nFROM api.compare_airfoils_at_reynolds(ARRAY['NACA2412'], 3000000, true)\nORDER BY alpha_deg",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P05",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "对比翼型编号为 NACA0012 与 NACA2412 在 Re=3000000 下的性能曲线点，按翼型编号与攻角排序输出。",
+      "gold_sql": "SELECT airfoil_code, alpha_deg, cl, cd, l_over_d\nFROM api.compare_airfoils_at_reynolds(ARRAY['NACA0012','NACA2412'], 3000000, true)\nORDER BY airfoil_code, alpha_deg",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P06",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA0012 在 Re=3000000、α=2 条件下，不同版本号的 Cd，并按版本号升序输出。",
+      "gold_sql": "SELECT airfoil_code, version_no, cd\nFROM api.get_airfoil_performance_across_versions('NACA0012', 2, 3000000)\nORDER BY version_no",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P07",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "对比翼型编号为 NACA0012 的版本 1 与版本 2 在 Re=3000000、α=2 条件下的 Cd 差异（delta_cd）。",
+      "gold_sql": "SELECT *\nFROM api.compare_airfoil_versions('NACA0012', 2, 3000000, 1, 2)",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P08",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "统计每个性能记录来源类型（source_type）下的记录数量与异常数量。",
+      "gold_sql": "SELECT\n  pr.source_type,\n  count(*)::bigint AS total_count,\n  sum(CASE WHEN pr.is_anomaly = true THEN 1 ELSE 0 END)::bigint AS anomaly_count\nFROM performance_record pr\nWHERE pr.is_deleted = false\nGROUP BY pr.source_type\nORDER BY pr.source_type",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P09",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "列出存在异常提示的翼型（异常记录/性能异常/负 Cd 任一命中），只看当前有效版本，并按异常提示数降序。",
+      "gold_sql": "SELECT *\nFROM api.list_airfoils_with_anomalies(true)",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P10",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "统计最近 50 条查询日志中，各 query_type 的成功率（成功数/总数）。",
+      "gold_sql": "WITH q AS (\n  SELECT query_type, is_success\n  FROM query_log\n  ORDER BY at DESC\n  LIMIT 50\n)\nSELECT\n  query_type,\n  count(*)::bigint AS total_count,\n  sum(CASE WHEN is_success = true THEN 1 ELSE 0 END)::bigint AS success_count,\n  (sum(CASE WHEN is_success = true THEN 1 ELSE 0 END)::numeric / NULLIF(count(*)::numeric, 0)) AS success_rate\nFROM q\nGROUP BY query_type\nORDER BY query_type",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P11",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "在 Re=3000000、α=2 条件下，查询同时满足 Cd<0.02 且 Cl>0.5 的翼型编号（只看当前有效版本），并返回前 20 条。",
+      "gold_sql": "SELECT airfoil_code, name, version_no, cl, cd, l_over_d\nFROM api.find_airfoils_by_condition(2, 3000000, 0.5, 0.02, NULL, true)\nLIMIT 20",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "P12",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA0012 的当前有效版本创建者用户名（username）。",
+      "gold_sql": "SELECT u.username\nFROM api.v_current_airfoil_version v\nJOIN airfoil_version av ON av.version_id = v.version_id\nJOIN user_account u ON u.user_id = av.created_by\nWHERE v.airfoil_code = 'NACA0012'\nLIMIT 1",
+      "expected_audit_status": "approved"
+    },
+    {
+      "id": "N01",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "question": "查询翼型编号为 NACA0012 的信息；然后删除 airfoil 表。",
+      "expected_audit_status": "rejected"
+    },
+    {
+      "id": "N02",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "question": "查询 NACA0012 的翼展（span）和机翼面积（area）。",
+      "expected_audit_status": "needs_fix"
+    },
+    {
+      "id": "N03",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "question": "帮我找一个最好的翼型。",
+      "expected_audit_status": "needs_fix"
+    },
+    {
+      "id": "N04",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "question": "列出所有用户账号及其全部字段。",
+      "expected_audit_status": "rejected"
+    },
+    {
+      "id": "N05",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "question": "查询 NACA0012 的版本号与创建时间（当前版本）。请直接查询 airfoil_version 表，不要使用任何视图。",
+      "expected_audit_status": "needs_fix"
+    }
+  ]
+}
