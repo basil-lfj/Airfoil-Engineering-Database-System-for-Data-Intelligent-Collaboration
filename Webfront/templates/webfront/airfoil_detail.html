@@ -1,0 +1,80 @@
+{% extends 'webfront/base.html' %}
+{% block title %}{{ code }} - 翼型详情{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>翼型: {{ code }}</h2>
+    <table>
+        <tr><th style="width:150px;">编码</th><td>{{ airfoil.airfoil_code }}</td></tr>
+        <tr><th>名称</th><td>{{ airfoil.name }}</td></tr>
+        <tr><th>家族</th><td>{{ airfoil.family|default:"未知" }}</td></tr>
+        <tr><th>数据来源</th><td>{{ airfoil.provider|default:"未知" }} - {{ airfoil.dataset_name|default:"" }}</td></tr>
+        <tr><th>来源类型</th><td>{{ airfoil.source_type|default:"未知" }}</td></tr>
+        <tr><th>生成方式</th><td>{{ airfoil.generation_method|default:"-" }}</td></tr>
+        <tr><th>备注</th><td>{{ airfoil.remark|default:"-" }}</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>版本信息 ({{ versions|length }})</h2>
+    <table>
+        <thead>
+            <tr><th>版本号</th><th>类型</th><th>状态</th><th>当前版本</th><th>变更说明</th><th>性能记录</th></tr>
+        </thead>
+        <tbody>
+            {% for v in versions %}
+            <tr>
+                <td>{{ v.version_no }}</td>
+                <td><span class="badge badge-blue">{{ v.version_type }}</span></td>
+                <td><span class="badge badge-green">{{ v.status }}</span></td>
+                <td>{% if v.is_current %}<span class="badge badge-green">当前</span>{% endif %}</td>
+                <td>{{ v.change_note|default:"-" }}</td>
+                <td>{{ v.perf_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>几何坐标 ({{ geometry|length }} 点)</h2>
+    <table>
+        <thead>
+            <tr><th>序号</th><th>表面</th><th>X</th><th>Y</th></tr>
+        </thead>
+        <tbody>
+            {% for p in geometry %}
+            <tr>
+                <td>{{ p.point_order }}</td>
+                <td>{% if p.surface == "upper" %}<span class="badge badge-blue">上表面</span>{% else %}<span class="badge badge-orange">下表面</span>{% endif %}</td>
+                <td>{{ p.x|floatformat:6 }}</td>
+                <td>{{ p.y|floatformat:6 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2>性能数据 ({{ performances|length }} 条)</h2>
+    <table>
+        <thead>
+            <tr><th>攻角(°)</th><th>雷诺数</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th></tr>
+        </thead>
+        <tbody>
+            {% for p in performances %}
+            <tr>
+                <td>{{ p.alpha_deg }}</td>
+                <td>{{ p.reynolds_number }}</td>
+                <td>{{ p.cl|floatformat:4 }}</td>
+                <td>{{ p.cd|floatformat:6 }}</td>
+                <td>{% if p.l_over_d %}{{ p.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
+                <td><span class="badge {% if p.source_type == 'real' %}badge-green{% else %}badge-blue{% endif %}">{{ p.source_type }}</span></td>
+                <td>{% if p.is_anomaly %}<span class="badge badge-red">异常</span>{% else %}<span class="badge badge-gray">正常</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">暂无性能数据</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

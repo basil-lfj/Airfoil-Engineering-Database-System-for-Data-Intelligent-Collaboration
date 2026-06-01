@@ -1,0 +1,36 @@
+{% extends 'webfront/base.html' %}
+{% block title %}翼型列表 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>翼型列表</h2>
+    <p style="margin-bottom:1rem;color:#666;">共 {{ airfoils|length }} 个翼型</p>
+    <table>
+        <thead>
+            <tr>
+                <th>编码</th>
+                <th>名称</th>
+                <th>家族</th>
+                <th>数据来源</th>
+                <th>类型</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for af in airfoils %}
+            <tr>
+                <td><strong>{{ af.airfoil_code }}</strong></td>
+                <td>{{ af.name }}</td>
+                <td>{{ af.family|default:"未知" }}</td>
+                <td>{{ af.provider|default:"未知" }}</td>
+                <td>{% if af.is_generated %}<span class="badge badge-orange">生成</span>{% else %}<span class="badge badge-green">真实</span>{% endif %}</td>
+                <td>{{ af.created_at|date:"Y-m-d" }}</td>
+                <td><a href="{% url 'webfront:airfoil_detail' af.airfoil_code %}" class="btn btn-primary btn-sm">查看详情</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">暂无翼型数据</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'webfront/base.html' %}
+{% block title %}未找到 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="card" style="text-align:center;padding:3rem;">
+    <h2 style="font-size:3rem;color:#999;">404</h2>
+    <p style="margin:1rem 0;color:#666;">翼型 <strong>{{ code }}</strong> 未找到</p>
+    <a href="{% url 'webfront:airfoil_list' %}" class="btn btn-primary">返回翼型列表</a>
+</div>
+{% endblock %}

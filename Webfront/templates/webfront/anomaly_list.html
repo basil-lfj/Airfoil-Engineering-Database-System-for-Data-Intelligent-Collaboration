@@ -1,0 +1,38 @@
+{% extends 'webfront/base.html' %}
+{% block title %}异常数据 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>异常数据记录 ({{ anomalies|length }})</h2>
+    <div class="alert alert-info">数据库通过异常规则检测到的可疑性能记录，展示数据治理结果</div>
+    <table>
+        <thead>
+            <tr>
+                <th>翼型</th>
+                <th>规则</th>
+                <th>严重度</th>
+                <th>状态</th>
+                <th>详情</th>
+                <th>检测时间</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in anomalies %}
+            <tr>
+                <td><strong><a href="{% url 'webfront:airfoil_detail' a.airfoil_code %}">{{ a.airfoil_code }}</a></strong></td>
+                <td><span class="badge badge-red">{{ a.rule_code }}</span></td>
+                <td>
+                    {% if a.severity == 'high' %}<span class="badge badge-red">高{% elif a.severity == 'medium' %}<span class="badge badge-orange">中{% else %}<span class="badge badge-blue">低{% endif %}</span>
+                </td>
+                <td>
+                    {% if a.status == 'open' %}<span class="badge badge-red">待确认{% elif a.status == 'confirmed' %}<span class="badge badge-orange">已确认{% else %}<span class="badge badge-gray">已忽略{% endif %}</span>
+                </td>
+                <td style="max-width:300px;font-size:12px;word-break:break-all;">{{ a.details }}</td>
+                <td>{{ a.detected_at|date:"Y-m-d H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6">暂无异常数据</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'webfront/base.html' %}
+{% block title %}首页 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="num">{{ airfoil_count }}</div>
+        <div class="label">翼型总数</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ version_count }}</div>
+        <div class="label">数据版本</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ coord_count }}</div>
+        <div class="label">几何坐标点</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ perf_count }}</div>
+        <div class="label">性能记录</div>
+    </div>
+    <div class="stat-card">
+        <div class="num">{{ anomaly_count }}</div>
+        <div class="label">异常标记</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>快速查询</h2>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="{% url 'webfront:airfoil_list' %}" class="btn btn-primary">浏览所有翼型</a>
+        <a href="{% url 'webfront:search_airfoils' %}" class="btn btn-primary">按工况条件查询</a>
+        <a href="{% url 'webfront:compare_airfoils' %}" class="btn btn-primary">多翼型性能对比</a>
+        <a href="{% url 'webfront:anomaly_list' %}" class="btn btn-primary">查看异常数据</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>翼型与版本概览</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>翼型编码</th>
+                <th>名称</th>
+                <th>版本号</th>
+                <th>版本类型</th>
+                <th>状态</th>
+                <th>当前版本</th>
+                <th>性能记录</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for af in recent_airfoils %}
+            <tr>
+                <td><a href="{% url 'webfront:airfoil_detail' af.airfoil_code %}">{{ af.airfoil_code }}</a></td>
+                <td>{{ af.name }}</td>
+                <td>{{ af.version_no }}</td>
+                <td><span class="badge badge-blue">{{ af.version_type }}</span></td>
+                <td><span class="badge badge-green">{{ af.status }}</span></td>
+                <td>{% if af.is_current %}<span class="badge badge-green">是</span>{% else %}<span class="badge badge-gray">否</span>{% endif %}</td>
+                <td>{{ af.perf_records }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7">暂无数据</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

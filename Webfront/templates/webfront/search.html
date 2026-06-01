@@ -1,0 +1,71 @@
+{% extends 'webfront/base.html' %}
+{% block title %}工况查询 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>按条件查询翼型</h2>
+    <div class="alert alert-info">支持两种查询方式：<strong>按翼型名称搜索</strong> 或 <strong>按工况条件筛选</strong></div>
+    <form method="get" style="margin-bottom:1rem;">
+        <div class="search-box">
+            <input type="text" name="q" placeholder="输入翼型编码或名称..." value="{{ query }}">
+            <button type="submit">搜索</button>
+        </div>
+    </form>
+    <form method="get">
+        <div class="search-box">
+            <input type="number" name="alpha" placeholder="攻角 (deg)" value="{{ alpha }}" step="1">
+            <input type="number" name="reynolds" placeholder="雷诺数 (如 100000)" value="{{ reynolds }}" step="1000">
+            <input type="hidden" name="q" value="">
+            <button type="submit">按工况查询</button>
+        </div>
+    </form>
+</div>
+
+{% if results %}
+<div class="card">
+    <h2>查询结果 ({{ results|length }})</h2>
+    {% if alpha and reynolds %}
+    <table>
+        <thead>
+            <tr>
+                <th>翼型编码</th><th>名称</th><th>版本号</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td><strong>{{ r.airfoil_code }}</strong></td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.version_no }}</td>
+                <td>{{ r.cl|floatformat:4 }}</td>
+                <td>{{ r.cd|floatformat:6 }}</td>
+                <td>{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
+                <td><span class="badge badge-blue">{{ r.source_type }}</span></td>
+                <td>{% if r.is_anomaly %}<span class="badge badge-red">异常</span>{% else %}<span class="badge badge-gray">正常</span>{% endif %}</td>
+                <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-primary btn-sm">详情</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <table>
+        <thead>
+            <tr><th>翼型编码</th><th>名称</th><th>家族</th><th>类型</th><th>操作</th></tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td><strong>{{ r.airfoil_code }}</strong></td>
+                <td>{{ r.name }}</td>
+                <td>{{ r.family|default:"-" }}</td>
+                <td>{% if r.is_generated %}<span class="badge badge-orange">生成</span>{% else %}<span class="badge badge-green">真实</span>{% endif %}</td>
+                <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-primary btn-sm">详情</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% elif query or alpha %}
+<div class="alert alert-warn">未找到匹配结果</div>
+{% endif %}
+{% endblock %}
