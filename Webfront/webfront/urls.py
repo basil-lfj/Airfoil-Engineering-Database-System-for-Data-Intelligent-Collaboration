@@ -10,4 +10,5 @@ urlpatterns = [
     path('search/', views.search_airfoils, name='search_airfoils'),
     path('compare/', views.compare_airfoils, name='compare_airfoils'),
     path('anomalies/', views.anomaly_list, name='anomaly_list'),
+    path('visualize/', views.visualize, name='visualize'),
 ]

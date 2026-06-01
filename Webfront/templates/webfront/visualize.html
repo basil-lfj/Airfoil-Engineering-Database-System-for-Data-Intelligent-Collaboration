@@ -1,0 +1,131 @@
+{% extends 'webfront/base.html' %}
+{% load static %}
+{% block title %}可视化分析 · 翼型工程数据库{% endblock %}
+{% block content %}
+
+<div class="page-title">
+    <h1>数据可视化分析</h1>
+    <p>基于 {{ airfoil_count }} 个翼型、{{ perf_count|floatformat:"0" }} 条性能记录的全面可视化分析</p>
+</div>
+
+<div class="stat-grid">
+    <div class="stat"><div class="stat-num">{{ airfoil_count }}</div><div class="stat-label">翼型总数</div></div>
+    <div class="stat"><div class="stat-num">{{ version_count }}</div><div class="stat-label">数据版本</div></div>
+    <div class="stat"><div class="stat-num">{{ coord_count|floatformat:"0" }}</div><div class="stat-label">几何坐标点</div></div>
+    <div class="stat"><div class="stat-num">{{ perf_count|floatformat:"0" }}</div><div class="stat-label">性能记录</div></div>
+    <div class="stat"><div class="stat-num">{{ anomaly_count }}</div><div class="stat-label">异常标记</div></div>
+</div>
+
+{% if top_performers %}
+<div class="card">
+    <div class="card-header">
+        <h2>📊 翼型性能排行（按平均升阻比）</h2>
+        <span class="count">TOP {{ top_performers|length }}</span>
+    </div>
+    <div style="height:320px;" id="chart-performers"></div>
+</div>
+{% endif %}
+
+{% if anomaly_stats %}
+<div class="card">
+    <div class="card-header">
+        <h2>🚨 异常规则检测统计</h2>
+        <span class="count">{{ anomaly_stats|length }} 类</span>
+    </div>
+    <div style="height:250px;" id="chart-anomalies"></div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h2>🖼️ 翼型轮廓对比</h2>
+        <span class="count">5个代表性NACA翼型</span>
+    </div>
+    <img src="{% static 'visualization/01_foil_profiles.png' %}" alt="翼型轮廓对比" style="width:100%;border-radius:var(--radius);">
+    <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--ink-secondary);line-height:1.6;">
+        对称翼型（0006、0015）上下对称，有弯度翼型（2412、4421）中弧线弯曲明显。厚度从6%到21%变化。
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>🖼️ 升力系数 Cl — 攻角 α 关系</h2>
+        <span class="count">多Re条件对比</span>
+    </div>
+    <img src="{% static 'visualization/02_cl_alpha_multi_re.png' %}" alt="Cl-α曲线" style="width:100%;border-radius:var(--radius);">
+    <div style="margin-top:0.75rem;font-size:0.82rem;color:var(--ink-secondary);line-height:1.6;">
+        有弯度翼型的Cl值整体高于对称翼型。所有翼型在攻角约14°后出现失速。
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div class="card">
+        <div class="card-header"><h2>🖼️ 阻力与升阻比</h2></div>
+        <img src="{% static 'visualization/03_cd_and_ld.png' %}" alt="Cd和升阻比分析" style="width:100%;border-radius:var(--radius);">
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>🖼️ 多翼型性能对比</h2></div>
+        <img src="{% static 'visualization/04_multi_foil_comparison.png' %}" alt="多翼型性能对比" style="width:100%;border-radius:var(--radius);">
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div class="card">
+        <div class="card-header"><h2>🖼️ 异常数据检测</h2></div>
+        <img src="{% static 'visualization/05_anomaly_detection.png' %}" alt="异常数据检测" style="width:100%;border-radius:var(--radius);">
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>🖼️ 数据规模总览</h2></div>
+        <img src="{% static 'visualization/06_data_overview.png' %}" alt="数据规模总览" style="width:100%;border-radius:var(--radius);">
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+{% if top_performers %}
+(function(){
+    var c = document.getElementById('chart-performers');
+    var chart = echarts.init(c);
+    var data = {{ top_performers|safe }};
+    chart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 120, right: 30, top: 20, bottom: 30 },
+        xAxis: { type: 'value', name: '平均升阻比', nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
+        yAxis: {
+            type: 'category',
+            data: data.map(function(d){ return d.airfoil_code; }).reverse(),
+            axisLabel: { fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }
+        },
+        series: [{
+            type: 'bar',
+            data: data.map(function(d){ return parseFloat(d.avg_ld || 0); }).reverse(),
+            itemStyle: { color: '#0b1a2e', borderRadius: [0,3,3,0] },
+            barMaxWidth: 20
+        }]
+    });
+    window.addEventListener('resize', function(){ chart.resize(); });
+})();
+{% endif %}
+
+{% if anomaly_stats %}
+(function(){
+    var c = document.getElementById('chart-anomalies');
+    var chart = echarts.init(c);
+    var data = {{ anomaly_stats|safe }};
+    chart.setOption({
+        tooltip: { trigger: 'item' },
+        series: [{
+            type: 'pie',
+            radius: ['40%','70%'],
+            center: ['50%','50%'],
+            data: data.map(function(d){ return { name: d.rule_code + ' (' + d.description + ')', value: parseInt(d.cnt) }; }),
+            label: { fontSize: 11 },
+            itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+            color: ['#dc2626','#d97706','#059669','#2563eb']
+        }]
+    });
+    window.addEventListener('resize', function(){ chart.resize(); });
+})();
+{% endif %}
+</script>
+{% endblock %}

@@ -5,9 +5,13 @@ from .services import airfoil_service
 def index(request):
     stats = airfoil_service.get_statistics()
     recent_airfoils = airfoil_service.get_recent_airfoils()
+    top_performers = airfoil_service.get_top_performers()
+    anomaly_stats = airfoil_service.get_anomaly_stats()
     return render(request, 'webfront/index.html', {
         **stats,
         'recent_airfoils': recent_airfoils,
+        'top_performers': top_performers,
+        'anomaly_stats': anomaly_stats,
     })
 
 
@@ -72,3 +76,14 @@ def compare_airfoils(request):
 def anomaly_list(request):
     anomalies = airfoil_service.get_anomalies()
     return render(request, 'webfront/anomaly_list.html', {'anomalies': anomalies})
+
+
+def visualize(request):
+    top_performers = airfoil_service.get_top_performers()
+    anomaly_stats = airfoil_service.get_anomaly_stats()
+    stats = airfoil_service.get_statistics()
+    return render(request, 'webfront/visualize.html', {
+        **stats,
+        'top_performers': top_performers,
+        'anomaly_stats': anomaly_stats,
+    })

@@ -4,61 +4,296 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}翼型工程数据库系统{% endblock %}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #f6f8fa;
+            --surface: #ffffff;
+            --ink: #0b1a2e;
+            --ink-secondary: #4b5565;
+            --ink-tertiary: #94a3b8;
+            --border: #e4e7ec;
+            --accent: #d97706;
+            --accent-light: #fef3c7;
+            --accent-dark: #92400e;
+            --blue: #2563eb;
+            --blue-light: #eff6ff;
+            --green: #059669;
+            --green-light: #ecfdf5;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --orange-light: #fff7ed;
+            --gray-light: #f1f5f9;
+            --radius: 6px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
-        nav { background: #1a237e; color: #fff; padding: 0 2rem; display: flex; align-items: center; height: 56px; }
-        nav a { color: #fff; text-decoration: none; padding: 0 1rem; font-size: 14px; }
-        nav a:hover { color: #90caf9; }
-        nav .brand { font-size: 18px; font-weight: 600; margin-right: 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1.5rem; }
-        .card h2 { font-size: 1.2rem; color: #1a237e; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e8eaf6; }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
-        .stat-card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; text-align: center; }
-        .stat-card .num { font-size: 2rem; font-weight: 700; color: #1a237e; }
-        .stat-card .label { font-size: 0.85rem; color: #666; margin-top: 0.25rem; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e0e0e0; }
-        th { background: #f5f5f5; font-weight: 600; color: #555; }
-        tr:hover { background: #f5f7fa; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
-        .badge-green { background: #e8f5e9; color: #2e7d32; }
-        .badge-red { background: #ffebee; color: #c62828; }
-        .badge-blue { background: #e3f2fd; color: #1565c0; }
-        .badge-orange { background: #fff3e0; color: #e65100; }
-        .badge-gray { background: #f5f5f5; color: #616161; }
-        a { color: #1565c0; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .search-box { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .search-box input, .search-box select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
-        .search-box input[type="text"] { flex: 1; min-width: 200px; }
-        .search-box button { padding: 0.5rem 1.5rem; background: #1a237e; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .search-box button:hover { background: #283593; }
-        .alert { padding: 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 14px; }
-        .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-        .alert-warn { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-        .btn { display: inline-block; padding: 0.5rem 1rem; border-radius: 4px; font-size: 14px; text-decoration: none; cursor: pointer; border: none; }
-        .btn-primary { background: #1a237e; color: #fff; }
-        .btn-primary:hover { background: #283593; text-decoration: none; }
-        .btn-sm { padding: 0.25rem 0.5rem; font-size: 12px; }
-        footer { text-align: center; padding: 2rem; color: #999; font-size: 13px; }
+
+        html { font-size: 15px; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Navigation ── */
+        .nav {
+            background: var(--ink);
+            color: #fff;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            height: 52px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 0.25rem;
+        }
+        .nav-brand {
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-right: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .nav-brand svg { width: 20px; height: 20px; }
+        .nav a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 450;
+            border-radius: var(--radius);
+            transition: all 0.15s;
+        }
+        .nav a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+        .nav a.active { color: #fff; background: rgba(255,255,255,0.12); }
+
+        /* ── Layout ── */
+        .container { max-width: 1280px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-header h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+        .card-header .count {
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            color: var(--ink-tertiary);
+        }
+
+        /* ── Stats Grid ── */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            transition: border-color 0.15s;
+        }
+        .stat:hover { border-color: var(--ink-tertiary); }
+        .stat-num {
+            font-family: var(--font-mono);
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--ink-secondary);
+            margin-top: 0.2rem;
+        }
+
+        /* ── Tables ── */
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        thead th {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            font-weight: 550;
+            font-size: 0.78rem;
+            color: var(--ink-secondary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: var(--gray-light); }
+        tbody tr:nth-child(even) { background: rgba(0,0,0,0.015); }
+        tbody tr:nth-child(even):hover { background: var(--gray-light); }
+
+        /* ── Badges ── */
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            border: 1px solid transparent;
+        }
+        .tag-green { background: var(--green-light); color: var(--green); border-color: #a7f3d0; }
+        .tag-red { background: var(--red-light); color: var(--red); border-color: #fecaca; }
+        .tag-blue { background: var(--blue-light); color: var(--blue); border-color: #bfdbfe; }
+        .tag-amber { background: var(--orange-light); color: var(--accent-dark); border-color: #fed7aa; }
+        .tag-gray { background: var(--gray-light); color: var(--ink-secondary); border-color: var(--border); }
+
+        /* ── Links ── */
+        .link {
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+        .link:hover { color: var(--accent); }
+        .link-mono {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--ink);
+            transition: all 0.12s;
+        }
+        .btn:hover { border-color: var(--ink-tertiary); background: var(--gray-light); text-decoration: none; }
+        .btn-primary {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink);
+        }
+        .btn-primary:hover { background: #1c3250; border-color: #1c3250; }
+        .btn-sm { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+
+        /* ── Forms ── */
+        .search-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        .search-row input, .search-row select {
+            padding: 0.45rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+            background: var(--surface);
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.12s;
+        }
+        .search-row input:focus { border-color: var(--ink); }
+        .search-row input[type="text"] { flex: 1; min-width: 200px; }
+        .search-row input[type="number"] { width: 140px; }
+
+        /* ── Alert ── */
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+            border: 1px solid;
+        }
+        .alert-info { background: var(--blue-light); color: #1e40af; border-color: #bfdbfe; }
+        .alert-warn { background: var(--orange-light); color: var(--accent-dark); border-color: #fed7aa; }
+
+        /* ── Key-Value ── */
+        .kv-table { width: 100%; }
+        .kv-table td { padding: 0.4rem 0; border: none; font-size: 0.85rem; }
+        .kv-table td:first-child { color: var(--ink-secondary); width: 130px; font-size: 0.8rem; }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--ink-tertiary);
+            font-size: 0.78rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        /* ── Page Title ── */
+        .page-title {
+            margin-bottom: 1.5rem;
+        }
+        .page-title h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .page-title p {
+            font-size: 0.85rem;
+            color: var(--ink-secondary);
+            margin-top: 0.15rem;
+        }
     </style>
 </head>
 <body>
-    <nav>
-        <span class="brand">翼型工程数据库</span>
-        <a href="{% url 'webfront:index' %}">首页</a>
-        <a href="{% url 'webfront:airfoil_list' %}">翼型列表</a>
-        <a href="{% url 'webfront:search_airfoils' %}">工况查询</a>
-        <a href="{% url 'webfront:compare_airfoils' %}">翼型对比</a>
-        <a href="{% url 'webfront:anomaly_list' %}">异常数据</a>
+    <nav class="nav">
+        <span class="nav-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 20 L12 4 L21 20"/><path d="M5 16 L19 16"/><circle cx="12" cy="10" r="1.5"/></svg>
+            翼型数据库
+        </span>
+        <a href="{% url 'webfront:index' %}" {% if request.path == '/' %}class="active"{% endif %}>总览</a>
+        <a href="{% url 'webfront:airfoil_list' %}" {% if '/airfoils/' in request.path and request.path != '/' %}class="active"{% endif %}>翼型</a>
+        <a href="{% url 'webfront:search_airfoils' %}" {% if '/search/' in request.path %}class="active"{% endif %}>查询</a>
+        <a href="{% url 'webfront:compare_airfoils' %}" {% if '/compare/' in request.path %}class="active"{% endif %}>对比</a>
+        <a href="{% url 'webfront:anomaly_list' %}" {% if '/anomalies/' in request.path %}class="active"{% endif %}>异常</a>
+        <a href="{% url 'webfront:visualize' %}" {% if '/visualize/' in request.path %}class="active"{% endif %}>可视化</a>
     </nav>
-    <div class="container">
+    <main class="container">
         {% block content %}{% endblock %}
+    </main>
+    <div class="footer">
+        翼型工程数据库系统 · 面向数据智能协同 · 2026
     </div>
-    <footer>
-        翼型工程数据库系统 &copy; 2026
-    </footer>
 </body>
 </html>

@@ -1,68 +1,172 @@
 {% extends 'webfront/base.html' %}
-{% block title %}首页 - 翼型工程数据库系统{% endblock %}
+{% load static %}
+{% block title %}总览 · 翼型工程数据库{% endblock %}
 {% block content %}
+
+<div class="page-title">
+    <h1>系统总览</h1>
+    <p>面向数据智能协同的翼型工程数据库 · 共 {{ airfoil_count }} 个翼型, {{ perf_count|floatformat:"0" }} 条性能记录</p>
+</div>
+
 <div class="stat-grid">
-    <div class="stat-card">
-        <div class="num">{{ airfoil_count }}</div>
-        <div class="label">翼型总数</div>
+    <div class="stat">
+        <div class="stat-num">{{ airfoil_count }}</div>
+        <div class="stat-label">翼型总数</div>
     </div>
-    <div class="stat-card">
-        <div class="num">{{ version_count }}</div>
-        <div class="label">数据版本</div>
+    <div class="stat">
+        <div class="stat-num">{{ version_count }}</div>
+        <div class="stat-label">数据版本</div>
     </div>
-    <div class="stat-card">
-        <div class="num">{{ coord_count }}</div>
-        <div class="label">几何坐标点</div>
+    <div class="stat">
+        <div class="stat-num">{{ coord_count|floatformat:"0" }}</div>
+        <div class="stat-label">几何坐标点</div>
     </div>
-    <div class="stat-card">
-        <div class="num">{{ perf_count }}</div>
-        <div class="label">性能记录</div>
+    <div class="stat">
+        <div class="stat-num">{{ perf_count|floatformat:"0" }}</div>
+        <div class="stat-label">性能记录</div>
     </div>
-    <div class="stat-card">
-        <div class="num">{{ anomaly_count }}</div>
-        <div class="label">异常标记</div>
+    <div class="stat">
+        <div class="stat-num">{{ anomaly_count }}</div>
+        <div class="stat-label">异常标记</div>
     </div>
 </div>
 
 <div class="card">
-    <h2>快速查询</h2>
-    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+    <div class="card-header">
+        <h2>快速入口</h2>
+    </div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
         <a href="{% url 'webfront:airfoil_list' %}" class="btn btn-primary">浏览所有翼型</a>
-        <a href="{% url 'webfront:search_airfoils' %}" class="btn btn-primary">按工况条件查询</a>
-        <a href="{% url 'webfront:compare_airfoils' %}" class="btn btn-primary">多翼型性能对比</a>
-        <a href="{% url 'webfront:anomaly_list' %}" class="btn btn-primary">查看异常数据</a>
+        <a href="{% url 'webfront:search_airfoils' %}" class="btn btn-primary">按工况查询</a>
+        <a href="{% url 'webfront:compare_airfoils' %}" class="btn btn-primary">翼型性能对比</a>
+        <a href="{% url 'webfront:visualize' %}" class="btn btn-primary">可视化分析</a>
+        <a href="{% url 'webfront:anomaly_list' %}" class="btn">异常数据</a>
     </div>
 </div>
 
+{% if top_performers %}
 <div class="card">
-    <h2>翼型与版本概览</h2>
+    <div class="card-header">
+        <h2>翼型升阻比排行 TOP {{ top_performers|length }}</h2>
+        <span class="count">交互式图表</span>
+    </div>
+    <div style="height:300px;" id="chart-performers"></div>
+</div>
+{% endif %}
+
+{% if anomaly_stats %}
+<div class="card">
+    <div class="card-header">
+        <h2>异常规则检测统计</h2>
+        <span class="count">类别数：{{ anomaly_stats|length }}</span>
+    </div>
+    <div style="height:250px;" id="chart-anomalies"></div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h2>翼型与版本</h2>
+        <span class="count">{{ recent_airfoils|length }} 条</span>
+    </div>
     <table>
         <thead>
             <tr>
-                <th>翼型编码</th>
-                <th>名称</th>
-                <th>版本号</th>
-                <th>版本类型</th>
+                <th>翼型</th>
+                <th>版本</th>
+                <th>类型</th>
                 <th>状态</th>
-                <th>当前版本</th>
+                <th>当前</th>
                 <th>性能记录</th>
             </tr>
         </thead>
         <tbody>
             {% for af in recent_airfoils %}
             <tr>
-                <td><a href="{% url 'webfront:airfoil_detail' af.airfoil_code %}">{{ af.airfoil_code }}</a></td>
-                <td>{{ af.name }}</td>
+                <td><a href="{% url 'webfront:airfoil_detail' af.airfoil_code %}" class="link link-mono">{{ af.airfoil_code }}</a></td>
                 <td>{{ af.version_no }}</td>
-                <td><span class="badge badge-blue">{{ af.version_type }}</span></td>
-                <td><span class="badge badge-green">{{ af.status }}</span></td>
-                <td>{% if af.is_current %}<span class="badge badge-green">是</span>{% else %}<span class="badge badge-gray">否</span>{% endif %}</td>
-                <td>{{ af.perf_records }}</td>
+                <td><span class="tag tag-blue">{{ af.version_type }}</span></td>
+                <td><span class="tag tag-green">{{ af.status }}</span></td>
+                <td>{% if af.is_current %}<span class="tag tag-green">当前</span>{% else %}<span class="tag tag-gray">历史</span>{% endif %}</td>
+                <td style="font-family:var(--font-mono);font-size:0.8rem;">{{ af.perf_records }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="7">暂无数据</td></tr>
+            <tr><td colspan="6" style="color:var(--ink-tertiary);text-align:center;padding:2rem;">暂无数据</td></tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>数据可视化预览</h2>
+        <span class="count">6 张分析图表</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+        <a href="{% url 'webfront:visualize' %}" style="display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;text-decoration:none;transition:border-color 0.15s;">
+            <img src="{% static 'visualization/01_foil_profiles.png' %}" alt="翼型轮廓" style="width:100%;height:120px;object-fit:cover;display:block;">
+            <div style="padding:0.5rem;font-size:0.75rem;color:var(--ink-secondary);text-align:center;">翼型轮廓对比</div>
+        </a>
+        <a href="{% url 'webfront:visualize' %}" style="display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;text-decoration:none;transition:border-color 0.15s;">
+            <img src="{% static 'visualization/02_cl_alpha_multi_re.png' %}" alt="Cl-α" style="width:100%;height:120px;object-fit:cover;display:block;">
+            <div style="padding:0.5rem;font-size:0.75rem;color:var(--ink-secondary);text-align:center;">升力系数曲线</div>
+        </a>
+        <a href="{% url 'webfront:visualize' %}" style="display:block;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;text-decoration:none;transition:border-color 0.15s;">
+            <img src="{% static 'visualization/04_multi_foil_comparison.png' %}" alt="多翼型对比" style="width:100%;height:120px;object-fit:cover;display:block;">
+            <div style="padding:0.5rem;font-size:0.75rem;color:var(--ink-secondary);text-align:center;">多翼型性能对比</div>
+        </a>
+    </div>
+    <div style="margin-top:0.75rem;text-align:center;">
+        <a href="{% url 'webfront:visualize' %}" class="btn">查看全部 6 张图表 →</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+{% if top_performers %}
+(function(){
+    var c = document.getElementById('chart-performers');
+    var chart = echarts.init(c);
+    var data = {{ top_performers|safe }};
+    chart.setOption({
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 120, right: 30, top: 15, bottom: 30 },
+        xAxis: { type: 'value', name: '平均升阻比', nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
+        yAxis: {
+            type: 'category',
+            data: data.map(function(d){ return d.airfoil_code; }).reverse(),
+            axisLabel: { fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }
+        },
+        series: [{
+            type: 'bar',
+            data: data.map(function(d){ return parseFloat(d.avg_ld || 0); }).reverse(),
+            itemStyle: { color: '#0b1a2e', borderRadius: [0,3,3,0] },
+            barMaxWidth: 18
+        }]
+    });
+    window.addEventListener('resize', function(){ chart.resize(); });
+})();
+{% endif %}
+
+{% if anomaly_stats %}
+(function(){
+    var c = document.getElementById('chart-anomalies');
+    var chart = echarts.init(c);
+    var data = {{ anomaly_stats|safe }};
+    chart.setOption({
+        tooltip: { trigger: 'item' },
+        series: [{
+            type: 'pie',
+            radius: ['40%','70%'],
+            center: ['50%','50%'],
+            data: data.map(function(d){ return { name: d.rule_code + ' (' + d.description + ')', value: parseInt(d.cnt) } }),
+            label: { fontSize: 11 },
+            itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+            color: ['#dc2626','#d97706','#059669','#2563eb']
+        }]
+    });
+    window.addEventListener('resize', function(){ chart.resize(); });
+})();
+{% endif %}
+</script>
 {% endblock %}

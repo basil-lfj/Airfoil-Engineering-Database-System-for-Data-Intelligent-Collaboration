@@ -4,7 +4,19 @@ from decimal import Decimal
 
 def dictfetchall(cursor):
     columns = [col[0] for col in cursor.description]
-    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+    rows = []
+    for row in cursor.fetchall():
+        processed_row = []
+        for value in row:
+            if isinstance(value, Decimal):
+                if value.as_integer_ratio()[1] == 1:
+                    processed_row.append(int(value))
+                else:
+                    processed_row.append(float(value))
+            else:
+                processed_row.append(value)
+        rows.append(dict(zip(columns, processed_row)))
+    return rows
 
 
 def get_statistics():
@@ -157,6 +169,35 @@ def get_suggested_airfoils():
             WHERE is_deleted = false
             ORDER BY airfoil_code
             LIMIT 5
+        """)
+        return dictfetchall(cursor)
+
+
+def get_top_performers():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT a.airfoil_code, a.name, count(pr.record_id) AS perf_count,
+                   avg(pr.cl) AS avg_cl, avg(pr.cd) AS avg_cd,
+                   avg(COALESCE(pr.l_over_d, pr.cl / NULLIF(pr.cd, 0))) AS avg_ld
+            FROM airfoil a
+            JOIN airfoil_version av ON av.airfoil_id = a.airfoil_id AND av.is_current = true
+            JOIN performance_record pr ON pr.version_id = av.version_id AND pr.is_deleted = false
+            WHERE a.is_deleted = false
+            GROUP BY a.airfoil_code, a.name
+            ORDER BY avg_ld DESC NULLS LAST
+            LIMIT 10
+        """)
+        return dictfetchall(cursor)
+
+
+def get_anomaly_stats():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT r.rule_code, r.description, r.severity, count(ar.anomaly_id) AS cnt
+            FROM anomaly_rule r
+            LEFT JOIN anomaly_record ar ON ar.rule_id = r.rule_id
+            GROUP BY r.rule_code, r.description, r.severity
+            ORDER BY cnt DESC
         """)
         return dictfetchall(cursor)
 

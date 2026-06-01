@@ -1,42 +1,106 @@
 {% extends 'webfront/base.html' %}
-{% block title %}翼型对比 - 翼型工程数据库系统{% endblock %}
+{% block title %}翼型对比 - 翼型工程数据库{% endblock %}
 {% block content %}
+
+<div class="page-title">
+    <h1>多翼型性能对比</h1>
+    <p>输入多个翼型编码，查看相同雷诺数下的交互式性能曲线</p>
+</div>
+
 <div class="card">
-    <h2>多翼型性能对比</h2>
-    <div class="alert alert-info">输入多个翼型编码（逗号分隔），查看它们在相同雷诺数下的性能曲线数据</div>
     <form method="get">
-        <div class="search-box">
-            <input type="text" name="codes" placeholder="翼型编码，逗号分隔 (如 NACA_2412,NACA_4412,NACA_0006)" value="{{ codes_str }}" style="flex:2;">
-            <input type="number" name="reynolds" placeholder="雷诺数" value="{{ reynolds }}" style="width:120px;">
-            <button type="submit">对比</button>
+        <div class="search-row">
+            <input type="text" name="codes" placeholder="翼型编码，逗号分隔（如 NACA_2412,NACA_4412,NACA_0006）" value="{{ codes_str }}" style="flex:2;">
+            <input type="number" name="reynolds" placeholder="雷诺数" value="{{ reynolds }}">
+            <button type="submit" class="btn btn-primary">对比</button>
         </div>
     </form>
 </div>
 
 {% if result %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+    <div class="card">
+        <div class="card-header"><h2>Cl - α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
+        <div style="height:320px;" id="chart-cl"></div>
+    </div>
+    <div class="card">
+        <div class="card-header"><h2>Cd - α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
+        <div style="height:320px;" id="chart-cd"></div>
+    </div>
+</div>
 <div class="card">
-    <h2>对比结果 (Re = {{ reynolds }})</h2>
+    <div class="card-header"><h2>升阻比 L/D - α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
+    <div style="height:320px;" id="chart-ld"></div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>对比数据明细</h2><span class="count">{{ result|length }} 条</span></div>
+    <div style="max-height:400px;overflow-y:auto;">
     <table>
         <thead>
-            <tr><th>翼型</th><th>版本</th><th>攻角(°)</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th></tr>
+            <tr><th>翼型</th><th>攻角(°)</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th></tr>
         </thead>
         <tbody>
             {% for r in result %}
             <tr>
-                <td><strong><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}">{{ r.airfoil_code }}</a></strong></td>
-                <td>{{ r.version_no }}</td>
+                <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="link link-mono">{{ r.airfoil_code }}</a></td>
                 <td>{{ r.alpha_deg }}</td>
-                <td>{{ r.cl|floatformat:4 }}</td>
-                <td>{{ r.cd|floatformat:6 }}</td>
-                <td>{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
-                <td><span class="badge {% if r.source_type == 'real' %}badge-green{% else %}badge-blue{% endif %}">{{ r.source_type }}</span></td>
-                <td>{% if r.is_anomaly %}<span class="badge badge-red">异常</span>{% endif %}</td>
+                <td style="font-family:var(--font-mono);font-size:0.8rem;">{{ r.cl|floatformat:4 }}</td>
+                <td style="font-family:var(--font-mono);font-size:0.8rem;">{{ r.cd|floatformat:6 }}</td>
+                <td style="font-family:var(--font-mono);font-size:0.8rem;">{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
+                <td><span class="tag {% if r.source_type == 'real' %}tag-green{% else %}tag-blue{% endif %}">{{ r.source_type }}</span></td>
+                <td>{% if r.is_anomaly %}<span class="tag tag-red">异常</span>{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+(function(){
+    var data = {{ result|safe }};
+    var codes = [...new Set(data.map(function(d){ return d.airfoil_code; }))];
+    var colors = ['#0b1a2e','#2563eb','#059669','#d97706','#dc2626','#8b5cf6','#ec4899'];
+
+    function buildSeries(metric, yName) {
+        return codes.map(function(code, i) {
+            var points = data.filter(function(d){ return d.airfoil_code === code; }).sort(function(a,b){ return a.alpha_deg - b.alpha_deg; });
+            return {
+                name: code,
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 4,
+                lineStyle: { width: 2 },
+                data: points.map(function(d){ return [parseFloat(d.alpha_deg), parseFloat(d[metric] || 0)]; }),
+                itemStyle: { color: colors[i % colors.length] }
+            };
+        });
+    }
+
+    function makeChart(el, series, yName) {
+        var chart = echarts.init(document.getElementById(el));
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: codes, bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
+            grid: { left: 55, right: 20, top: 20, bottom: 40 },
+            xAxis: { type: 'value', name: '攻角 α (°)', nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
+            yAxis: { type: 'value', name: yName, nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
+            series: series
+        });
+        window.addEventListener('resize', function(){ chart.resize(); });
+    }
+
+    makeChart('chart-cl', buildSeries('cl', '升力系数 Cl'));
+    makeChart('chart-cd', buildSeries('cd', '阻力系数 Cd'));
+    makeChart('chart-ld', buildSeries('l_over_d', '升阻比 L/D'));
+})();
+</script>
 {% elif codes_str %}
-<div class="alert alert-warn">未找到对比数据，请检查翼型编码是否正确</div>
+<div class="alert" style="background:var(--orange-light);color:var(--accent-dark);border-color:#fed7aa;">
+    未找到对比数据，请检查翼型编码是否正确
+</div>
 {% endif %}
 {% endblock %}
