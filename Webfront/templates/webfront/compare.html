@@ -1,0 +1,42 @@
+{% extends 'webfront/base.html' %}
+{% block title %}翼型对比 - 翼型工程数据库系统{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>多翼型性能对比</h2>
+    <div class="alert alert-info">输入多个翼型编码（逗号分隔），查看它们在相同雷诺数下的性能曲线数据</div>
+    <form method="get">
+        <div class="search-box">
+            <input type="text" name="codes" placeholder="翼型编码，逗号分隔 (如 NACA_2412,NACA_4412,NACA_0006)" value="{{ codes_str }}" style="flex:2;">
+            <input type="number" name="reynolds" placeholder="雷诺数" value="{{ reynolds }}" style="width:120px;">
+            <button type="submit">对比</button>
+        </div>
+    </form>
+</div>
+
+{% if result %}
+<div class="card">
+    <h2>对比结果 (Re = {{ reynolds }})</h2>
+    <table>
+        <thead>
+            <tr><th>翼型</th><th>版本</th><th>攻角(°)</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th></tr>
+        </thead>
+        <tbody>
+            {% for r in result %}
+            <tr>
+                <td><strong><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}">{{ r.airfoil_code }}</a></strong></td>
+                <td>{{ r.version_no }}</td>
+                <td>{{ r.alpha_deg }}</td>
+                <td>{{ r.cl|floatformat:4 }}</td>
+                <td>{{ r.cd|floatformat:6 }}</td>
+                <td>{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
+                <td><span class="badge {% if r.source_type == 'real' %}badge-green{% else %}badge-blue{% endif %}">{{ r.source_type }}</span></td>
+                <td>{% if r.is_anomaly %}<span class="badge badge-red">异常</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% elif codes_str %}
+<div class="alert alert-warn">未找到对比数据，请检查翼型编码是否正确</div>
+{% endif %}
+{% endblock %}

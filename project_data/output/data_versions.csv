@@ -1,0 +1,501 @@
+version_id,airfoil_id,version_no,version_type,geom_source,geom_source_url
+NACA_0006_v1,NACA_0006,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0006_v2,NACA_0006,2,generated_variant,generated_from_base,
+NACA_0006_v3,NACA_0006,3,generated_variant,generated_from_base,
+NACA_0006_v4,NACA_0006,4,generated_variant,generated_from_base,
+NACA_0006_v5,NACA_0006,5,generated_variant,generated_from_base,
+NACA_0009_v1,NACA_0009,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0009_v2,NACA_0009,2,generated_variant,generated_from_base,
+NACA_0009_v3,NACA_0009,3,generated_variant,generated_from_base,
+NACA_0009_v4,NACA_0009,4,generated_variant,generated_from_base,
+NACA_0009_v5,NACA_0009,5,generated_variant,generated_from_base,
+NACA_0015_v1,NACA_0015,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0015_v2,NACA_0015,2,generated_variant,generated_from_base,
+NACA_0015_v3,NACA_0015,3,generated_variant,generated_from_base,
+NACA_0015_v4,NACA_0015,4,generated_variant,generated_from_base,
+NACA_0015_v5,NACA_0015,5,generated_variant,generated_from_base,
+NACA_1410_v1,NACA_1410,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_1410_v2,NACA_1410,2,generated_variant,generated_from_base,
+NACA_1410_v3,NACA_1410,3,generated_variant,generated_from_base,
+NACA_1410_v4,NACA_1410,4,generated_variant,generated_from_base,
+NACA_1410_v5,NACA_1410,5,generated_variant,generated_from_base,
+NACA_2412_v1,NACA_2412,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2412_v2,NACA_2412,2,generated_variant,generated_from_base,
+NACA_2412_v3,NACA_2412,3,generated_variant,generated_from_base,
+NACA_2412_v4,NACA_2412,4,generated_variant,generated_from_base,
+NACA_2412_v5,NACA_2412,5,generated_variant,generated_from_base,
+NACA_2421_v1,NACA_2421,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2421_v2,NACA_2421,2,generated_variant,generated_from_base,
+NACA_2421_v3,NACA_2421,3,generated_variant,generated_from_base,
+NACA_2421_v4,NACA_2421,4,generated_variant,generated_from_base,
+NACA_2421_v5,NACA_2421,5,generated_variant,generated_from_base,
+NACA_4421_v1,NACA_4421,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_4421_v2,NACA_4421,2,generated_variant,generated_from_base,
+NACA_4421_v3,NACA_4421,3,generated_variant,generated_from_base,
+NACA_4421_v4,NACA_4421,4,generated_variant,generated_from_base,
+NACA_4421_v5,NACA_4421,5,generated_variant,generated_from_base,
+NACA_0008-34_v1,NACA_0008-34,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0008-34_v2,NACA_0008-34,2,generated_variant,generated_from_base,
+NACA_0008-34_v3,NACA_0008-34,3,generated_variant,generated_from_base,
+NACA_0008-34_v4,NACA_0008-34,4,generated_variant,generated_from_base,
+NACA_0008-34_v5,NACA_0008-34,5,generated_variant,generated_from_base,
+NACA_0008_v1,NACA_0008,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0008_v2,NACA_0008,2,generated_variant,generated_from_base,
+NACA_0008_v3,NACA_0008,3,generated_variant,generated_from_base,
+NACA_0008_v4,NACA_0008,4,generated_variant,generated_from_base,
+NACA_0008_v5,NACA_0008,5,generated_variant,generated_from_base,
+NACA_0010-34_v1,NACA_0010-34,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-34_v2,NACA_0010-34,2,generated_variant,generated_from_base,
+NACA_0010-34_v3,NACA_0010-34,3,generated_variant,generated_from_base,
+NACA_0010-34_v4,NACA_0010-34,4,generated_variant,generated_from_base,
+NACA_0010-34_v5,NACA_0010-34,5,generated_variant,generated_from_base,
+NACA_0010-34_a=0.8_c(li)=0.2_v1,NACA_0010-34_a=0.8_c(li)=0.2,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-34_a=0.8_c(li)=0.2_v2,NACA_0010-34_a=0.8_c(li)=0.2,2,generated_variant,generated_from_base,
+NACA_0010-34_a=0.8_c(li)=0.2_v3,NACA_0010-34_a=0.8_c(li)=0.2,3,generated_variant,generated_from_base,
+NACA_0010-34_a=0.8_c(li)=0.2_v4,NACA_0010-34_a=0.8_c(li)=0.2,4,generated_variant,generated_from_base,
+NACA_0010-34_a=0.8_c(li)=0.2_v5,NACA_0010-34_a=0.8_c(li)=0.2,5,generated_variant,generated_from_base,
+NACA_0010-35_v1,NACA_0010-35,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-35_v2,NACA_0010-35,2,generated_variant,generated_from_base,
+NACA_0010-35_v3,NACA_0010-35,3,generated_variant,generated_from_base,
+NACA_0010-35_v4,NACA_0010-35,4,generated_variant,generated_from_base,
+NACA_0010-35_v5,NACA_0010-35,5,generated_variant,generated_from_base,
+NACA_0010-64_v1,NACA_0010-64,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-64_v2,NACA_0010-64,2,generated_variant,generated_from_base,
+NACA_0010-64_v3,NACA_0010-64,3,generated_variant,generated_from_base,
+NACA_0010-64_v4,NACA_0010-64,4,generated_variant,generated_from_base,
+NACA_0010-64_v5,NACA_0010-64,5,generated_variant,generated_from_base,
+NACA_0010-65_v1,NACA_0010-65,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-65_v2,NACA_0010-65,2,generated_variant,generated_from_base,
+NACA_0010-65_v3,NACA_0010-65,3,generated_variant,generated_from_base,
+NACA_0010-65_v4,NACA_0010-65,4,generated_variant,generated_from_base,
+NACA_0010-65_v5,NACA_0010-65,5,generated_variant,generated_from_base,
+NACA_0010-66_v1,NACA_0010-66,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010-66_v2,NACA_0010-66,2,generated_variant,generated_from_base,
+NACA_0010-66_v3,NACA_0010-66,3,generated_variant,generated_from_base,
+NACA_0010-66_v4,NACA_0010-66,4,generated_variant,generated_from_base,
+NACA_0010-66_v5,NACA_0010-66,5,generated_variant,generated_from_base,
+NACA_0010_v1,NACA_0010,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0010_v2,NACA_0010,2,generated_variant,generated_from_base,
+NACA_0010_v3,NACA_0010,3,generated_variant,generated_from_base,
+NACA_0010_v4,NACA_0010,4,generated_variant,generated_from_base,
+NACA_0010_v5,NACA_0010,5,generated_variant,generated_from_base,
+NACA_0012-34_v1,NACA_0012-34,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0012-34_v2,NACA_0012-34,2,generated_variant,generated_from_base,
+NACA_0012-34_v3,NACA_0012-34,3,generated_variant,generated_from_base,
+NACA_0012-34_v4,NACA_0012-34,4,generated_variant,generated_from_base,
+NACA_0012-34_v5,NACA_0012-34,5,generated_variant,generated_from_base,
+NACA_0012-64_v1,NACA_0012-64,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0012-64_v2,NACA_0012-64,2,generated_variant,generated_from_base,
+NACA_0012-64_v3,NACA_0012-64,3,generated_variant,generated_from_base,
+NACA_0012-64_v4,NACA_0012-64,4,generated_variant,generated_from_base,
+NACA_0012-64_v5,NACA_0012-64,5,generated_variant,generated_from_base,
+NACA_0012-64_a=0.8_c(li)=0.2_v1,NACA_0012-64_a=0.8_c(li)=0.2,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0012-64_a=0.8_c(li)=0.2_v2,NACA_0012-64_a=0.8_c(li)=0.2,2,generated_variant,generated_from_base,
+NACA_0012-64_a=0.8_c(li)=0.2_v3,NACA_0012-64_a=0.8_c(li)=0.2,3,generated_variant,generated_from_base,
+NACA_0012-64_a=0.8_c(li)=0.2_v4,NACA_0012-64_a=0.8_c(li)=0.2,4,generated_variant,generated_from_base,
+NACA_0012-64_a=0.8_c(li)=0.2_v5,NACA_0012-64_a=0.8_c(li)=0.2,5,generated_variant,generated_from_base,
+NACA_0018_v1,NACA_0018,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0018_v2,NACA_0018,2,generated_variant,generated_from_base,
+NACA_0018_v3,NACA_0018,3,generated_variant,generated_from_base,
+NACA_0018_v4,NACA_0018,4,generated_variant,generated_from_base,
+NACA_0018_v5,NACA_0018,5,generated_variant,generated_from_base,
+NACA_0021_v1,NACA_0021,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0021_v2,NACA_0021,2,generated_variant,generated_from_base,
+NACA_0021_v3,NACA_0021,3,generated_variant,generated_from_base,
+NACA_0021_v4,NACA_0021,4,generated_variant,generated_from_base,
+NACA_0021_v5,NACA_0021,5,generated_variant,generated_from_base,
+NACA_0024_v1,NACA_0024,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_0024_v2,NACA_0024,2,generated_variant,generated_from_base,
+NACA_0024_v3,NACA_0024,3,generated_variant,generated_from_base,
+NACA_0024_v4,NACA_0024,4,generated_variant,generated_from_base,
+NACA_0024_v5,NACA_0024,5,generated_variant,generated_from_base,
+NACA_1408_v1,NACA_1408,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_1408_v2,NACA_1408,2,generated_variant,generated_from_base,
+NACA_1408_v3,NACA_1408,3,generated_variant,generated_from_base,
+NACA_1408_v4,NACA_1408,4,generated_variant,generated_from_base,
+NACA_1408_v5,NACA_1408,5,generated_variant,generated_from_base,
+NACA_1412_v1,NACA_1412,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_1412_v2,NACA_1412,2,generated_variant,generated_from_base,
+NACA_1412_v3,NACA_1412,3,generated_variant,generated_from_base,
+NACA_1412_v4,NACA_1412,4,generated_variant,generated_from_base,
+NACA_1412_v5,NACA_1412,5,generated_variant,generated_from_base,
+NACA_16-006_v1,NACA_16-006,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16-006_v2,NACA_16-006,2,generated_variant,generated_from_base,
+NACA_16-006_v3,NACA_16-006,3,generated_variant,generated_from_base,
+NACA_16-006_v4,NACA_16-006,4,generated_variant,generated_from_base,
+NACA_16-006_v5,NACA_16-006,5,generated_variant,generated_from_base,
+NACA_16-012_v1,NACA_16-012,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16-012_v2,NACA_16-012,2,generated_variant,generated_from_base,
+NACA_16-012_v3,NACA_16-012,3,generated_variant,generated_from_base,
+NACA_16-012_v4,NACA_16-012,4,generated_variant,generated_from_base,
+NACA_16-012_v5,NACA_16-012,5,generated_variant,generated_from_base,
+NACA_16-015_v1,NACA_16-015,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16-015_v2,NACA_16-015,2,generated_variant,generated_from_base,
+NACA_16-015_v3,NACA_16-015,3,generated_variant,generated_from_base,
+NACA_16-015_v4,NACA_16-015,4,generated_variant,generated_from_base,
+NACA_16-015_v5,NACA_16-015,5,generated_variant,generated_from_base,
+NACA_16-018_v1,NACA_16-018,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16-018_v2,NACA_16-018,2,generated_variant,generated_from_base,
+NACA_16-018_v3,NACA_16-018,3,generated_variant,generated_from_base,
+NACA_16-018_v4,NACA_16-018,4,generated_variant,generated_from_base,
+NACA_16-018_v5,NACA_16-018,5,generated_variant,generated_from_base,
+NACA_16-021_v1,NACA_16-021,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16-021_v2,NACA_16-021,2,generated_variant,generated_from_base,
+NACA_16-021_v3,NACA_16-021,3,generated_variant,generated_from_base,
+NACA_16-021_v4,NACA_16-021,4,generated_variant,generated_from_base,
+NACA_16-021_v5,NACA_16-021,5,generated_variant,generated_from_base,
+NACA_16009_v1,NACA_16009,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_16009_v2,NACA_16009,2,generated_variant,generated_from_base,
+NACA_16009_v3,NACA_16009,3,generated_variant,generated_from_base,
+NACA_16009_v4,NACA_16009,4,generated_variant,generated_from_base,
+NACA_16009_v5,NACA_16009,5,generated_variant,generated_from_base,
+NACA_2.5411_v1,NACA_2.5411,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2.5411_v2,NACA_2.5411,2,generated_variant,generated_from_base,
+NACA_2.5411_v3,NACA_2.5411,3,generated_variant,generated_from_base,
+NACA_2.5411_v4,NACA_2.5411,4,generated_variant,generated_from_base,
+NACA_2.5411_v5,NACA_2.5411,5,generated_variant,generated_from_base,
+NACA_23012__12%_v1,NACA_23012__12%,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_23012__12%_v2,NACA_23012__12%,2,generated_variant,generated_from_base,
+NACA_23012__12%_v3,NACA_23012__12%,3,generated_variant,generated_from_base,
+NACA_23012__12%_v4,NACA_23012__12%,4,generated_variant,generated_from_base,
+NACA_23012__12%_v5,NACA_23012__12%,5,generated_variant,generated_from_base,
+NACA_23015_v1,NACA_23015,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_23015_v2,NACA_23015,2,generated_variant,generated_from_base,
+NACA_23015_v3,NACA_23015,3,generated_variant,generated_from_base,
+NACA_23015_v4,NACA_23015,4,generated_variant,generated_from_base,
+NACA_23015_v5,NACA_23015,5,generated_variant,generated_from_base,
+NACA_23018_v1,NACA_23018,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_23018_v2,NACA_23018,2,generated_variant,generated_from_base,
+NACA_23018_v3,NACA_23018,3,generated_variant,generated_from_base,
+NACA_23018_v4,NACA_23018,4,generated_variant,generated_from_base,
+NACA_23018_v5,NACA_23018,5,generated_variant,generated_from_base,
+NACA_23021_v1,NACA_23021,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_23021_v2,NACA_23021,2,generated_variant,generated_from_base,
+NACA_23021_v3,NACA_23021,3,generated_variant,generated_from_base,
+NACA_23021_v4,NACA_23021,4,generated_variant,generated_from_base,
+NACA_23021_v5,NACA_23021,5,generated_variant,generated_from_base,
+NACA_23024_v1,NACA_23024,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_23024_v2,NACA_23024,2,generated_variant,generated_from_base,
+NACA_23024_v3,NACA_23024,3,generated_variant,generated_from_base,
+NACA_23024_v4,NACA_23024,4,generated_variant,generated_from_base,
+NACA_23024_v5,NACA_23024,5,generated_variant,generated_from_base,
+NACA_2408_v1,NACA_2408,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2408_v2,NACA_2408,2,generated_variant,generated_from_base,
+NACA_2408_v3,NACA_2408,3,generated_variant,generated_from_base,
+NACA_2408_v4,NACA_2408,4,generated_variant,generated_from_base,
+NACA_2408_v5,NACA_2408,5,generated_variant,generated_from_base,
+NACA_2410_v1,NACA_2410,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2410_v2,NACA_2410,2,generated_variant,generated_from_base,
+NACA_2410_v3,NACA_2410,3,generated_variant,generated_from_base,
+NACA_2410_v4,NACA_2410,4,generated_variant,generated_from_base,
+NACA_2410_v5,NACA_2410,5,generated_variant,generated_from_base,
+NACA_2415_v1,NACA_2415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2415_v2,NACA_2415,2,generated_variant,generated_from_base,
+NACA_2415_v3,NACA_2415,3,generated_variant,generated_from_base,
+NACA_2415_v4,NACA_2415,4,generated_variant,generated_from_base,
+NACA_2415_v5,NACA_2415,5,generated_variant,generated_from_base,
+NACA_2418_v1,NACA_2418,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2418_v2,NACA_2418,2,generated_variant,generated_from_base,
+NACA_2418_v3,NACA_2418,3,generated_variant,generated_from_base,
+NACA_2418_v4,NACA_2418,4,generated_variant,generated_from_base,
+NACA_2418_v5,NACA_2418,5,generated_variant,generated_from_base,
+NACA_2424_v1,NACA_2424,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_2424_v2,NACA_2424,2,generated_variant,generated_from_base,
+NACA_2424_v3,NACA_2424,3,generated_variant,generated_from_base,
+NACA_2424_v4,NACA_2424,4,generated_variant,generated_from_base,
+NACA_2424_v5,NACA_2424,5,generated_variant,generated_from_base,
+NACA_4412_v1,NACA_4412,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_4412_v2,NACA_4412,2,generated_variant,generated_from_base,
+NACA_4412_v3,NACA_4412,3,generated_variant,generated_from_base,
+NACA_4412_v4,NACA_4412,4,generated_variant,generated_from_base,
+NACA_4412_v5,NACA_4412,5,generated_variant,generated_from_base,
+NACA_4415_v1,NACA_4415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_4415_v2,NACA_4415,2,generated_variant,generated_from_base,
+NACA_4415_v3,NACA_4415,3,generated_variant,generated_from_base,
+NACA_4415_v4,NACA_4415,4,generated_variant,generated_from_base,
+NACA_4415_v5,NACA_4415,5,generated_variant,generated_from_base,
+NACA_4418_v1,NACA_4418,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_4418_v2,NACA_4418,2,generated_variant,generated_from_base,
+NACA_4418_v3,NACA_4418,3,generated_variant,generated_from_base,
+NACA_4418_v4,NACA_4418,4,generated_variant,generated_from_base,
+NACA_4418_v5,NACA_4418,5,generated_variant,generated_from_base,
+NACA_4424_v1,NACA_4424,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_4424_v2,NACA_4424,2,generated_variant,generated_from_base,
+NACA_4424_v3,NACA_4424,3,generated_variant,generated_from_base,
+NACA_4424_v4,NACA_4424,4,generated_variant,generated_from_base,
+NACA_4424_v5,NACA_4424,5,generated_variant,generated_from_base,
+NACA_63(2)-615_v1,NACA_63(2)-615,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(2)-615_v2,NACA_63(2)-615,2,generated_variant,generated_from_base,
+NACA_63(2)-615_v3,NACA_63(2)-615,3,generated_variant,generated_from_base,
+NACA_63(2)-615_v4,NACA_63(2)-615,4,generated_variant,generated_from_base,
+NACA_63(2)-615_v5,NACA_63(2)-615,5,generated_variant,generated_from_base,
+NACA_63(2)A-015_v1,NACA_63(2)A-015,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(2)A-015_v2,NACA_63(2)A-015,2,generated_variant,generated_from_base,
+NACA_63(2)A-015_v3,NACA_63(2)A-015,3,generated_variant,generated_from_base,
+NACA_63(2)A-015_v4,NACA_63(2)A-015,4,generated_variant,generated_from_base,
+NACA_63(2)A-015_v5,NACA_63(2)A-015,5,generated_variant,generated_from_base,
+NACA_63(3)-018_v1,NACA_63(3)-018,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(3)-018_v2,NACA_63(3)-018,2,generated_variant,generated_from_base,
+NACA_63(3)-018_v3,NACA_63(3)-018,3,generated_variant,generated_from_base,
+NACA_63(3)-018_v4,NACA_63(3)-018,4,generated_variant,generated_from_base,
+NACA_63(3)-018_v5,NACA_63(3)-018,5,generated_variant,generated_from_base,
+NACA_63(3)-218_v1,NACA_63(3)-218,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(3)-218_v2,NACA_63(3)-218,2,generated_variant,generated_from_base,
+NACA_63(3)-218_v3,NACA_63(3)-218,3,generated_variant,generated_from_base,
+NACA_63(3)-218_v4,NACA_63(3)-218,4,generated_variant,generated_from_base,
+NACA_63(3)-218_v5,NACA_63(3)-218,5,generated_variant,generated_from_base,
+NACA_63(3)-618_v1,NACA_63(3)-618,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(3)-618_v2,NACA_63(3)-618,2,generated_variant,generated_from_base,
+NACA_63(3)-618_v3,NACA_63(3)-618,3,generated_variant,generated_from_base,
+NACA_63(3)-618_v4,NACA_63(3)-618,4,generated_variant,generated_from_base,
+NACA_63(3)-618_v5,NACA_63(3)-618,5,generated_variant,generated_from_base,
+NACA_63(4)-221_v1,NACA_63(4)-221,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(4)-221_v2,NACA_63(4)-221,2,generated_variant,generated_from_base,
+NACA_63(4)-221_v3,NACA_63(4)-221,3,generated_variant,generated_from_base,
+NACA_63(4)-221_v4,NACA_63(4)-221,4,generated_variant,generated_from_base,
+NACA_63(4)-221_v5,NACA_63(4)-221,5,generated_variant,generated_from_base,
+NACA_63(4)-421_v1,NACA_63(4)-421,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63(4)-421_v2,NACA_63(4)-421,2,generated_variant,generated_from_base,
+NACA_63(4)-421_v3,NACA_63(4)-421,3,generated_variant,generated_from_base,
+NACA_63(4)-421_v4,NACA_63(4)-421,4,generated_variant,generated_from_base,
+NACA_63(4)-421_v5,NACA_63(4)-421,5,generated_variant,generated_from_base,
+"NACA_63,3-418_v1","NACA_63,3-418",1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+"NACA_63,3-418_v2","NACA_63,3-418",2,generated_variant,generated_from_base,
+"NACA_63,3-418_v3","NACA_63,3-418",3,generated_variant,generated_from_base,
+"NACA_63,3-418_v4","NACA_63,3-418",4,generated_variant,generated_from_base,
+"NACA_63,3-418_v5","NACA_63,3-418",5,generated_variant,generated_from_base,
+NACA_63-206_v1,NACA_63-206,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63-206_v2,NACA_63-206,2,generated_variant,generated_from_base,
+NACA_63-206_v3,NACA_63-206,3,generated_variant,generated_from_base,
+NACA_63-206_v4,NACA_63-206,4,generated_variant,generated_from_base,
+NACA_63-206_v5,NACA_63-206,5,generated_variant,generated_from_base,
+NACA_63-209_v1,NACA_63-209,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63-209_v2,NACA_63-209,2,generated_variant,generated_from_base,
+NACA_63-209_v3,NACA_63-209,3,generated_variant,generated_from_base,
+NACA_63-209_v4,NACA_63-209,4,generated_variant,generated_from_base,
+NACA_63-209_v5,NACA_63-209,5,generated_variant,generated_from_base,
+NACA_63A210_v1,NACA_63A210,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_63A210_v2,NACA_63A210,2,generated_variant,generated_from_base,
+NACA_63A210_v3,NACA_63A210,3,generated_variant,generated_from_base,
+NACA_63A210_v4,NACA_63A210,4,generated_variant,generated_from_base,
+NACA_63A210_v5,NACA_63A210,5,generated_variant,generated_from_base,
+NACA_64(1)-112_v1,NACA_64(1)-112,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(1)-112_v2,NACA_64(1)-112,2,generated_variant,generated_from_base,
+NACA_64(1)-112_v3,NACA_64(1)-112,3,generated_variant,generated_from_base,
+NACA_64(1)-112_v4,NACA_64(1)-112,4,generated_variant,generated_from_base,
+NACA_64(1)-112_v5,NACA_64(1)-112,5,generated_variant,generated_from_base,
+NACA_64(2)-215_v1,NACA_64(2)-215,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(2)-215_v2,NACA_64(2)-215,2,generated_variant,generated_from_base,
+NACA_64(2)-215_v3,NACA_64(2)-215,3,generated_variant,generated_from_base,
+NACA_64(2)-215_v4,NACA_64(2)-215,4,generated_variant,generated_from_base,
+NACA_64(2)-215_v5,NACA_64(2)-215,5,generated_variant,generated_from_base,
+NACA_64(2)-415_v1,NACA_64(2)-415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(2)-415_v2,NACA_64(2)-415,2,generated_variant,generated_from_base,
+NACA_64(2)-415_v3,NACA_64(2)-415,3,generated_variant,generated_from_base,
+NACA_64(2)-415_v4,NACA_64(2)-415,4,generated_variant,generated_from_base,
+NACA_64(2)-415_v5,NACA_64(2)-415,5,generated_variant,generated_from_base,
+NACA_64(3)-218_v1,NACA_64(3)-218,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(3)-218_v2,NACA_64(3)-218,2,generated_variant,generated_from_base,
+NACA_64(3)-218_v3,NACA_64(3)-218,3,generated_variant,generated_from_base,
+NACA_64(3)-218_v4,NACA_64(3)-218,4,generated_variant,generated_from_base,
+NACA_64(3)-218_v5,NACA_64(3)-218,5,generated_variant,generated_from_base,
+NACA_64(3)-418_v1,NACA_64(3)-418,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(3)-418_v2,NACA_64(3)-418,2,generated_variant,generated_from_base,
+NACA_64(3)-418_v3,NACA_64(3)-418,3,generated_variant,generated_from_base,
+NACA_64(3)-418_v4,NACA_64(3)-418,4,generated_variant,generated_from_base,
+NACA_64(3)-418_v5,NACA_64(3)-418,5,generated_variant,generated_from_base,
+NACA_64(3)-618_v1,NACA_64(3)-618,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(3)-618_v2,NACA_64(3)-618,2,generated_variant,generated_from_base,
+NACA_64(3)-618_v3,NACA_64(3)-618,3,generated_variant,generated_from_base,
+NACA_64(3)-618_v4,NACA_64(3)-618,4,generated_variant,generated_from_base,
+NACA_64(3)-618_v5,NACA_64(3)-618,5,generated_variant,generated_from_base,
+NACA_64(4)-221_v1,NACA_64(4)-221,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(4)-221_v2,NACA_64(4)-221,2,generated_variant,generated_from_base,
+NACA_64(4)-221_v3,NACA_64(4)-221,3,generated_variant,generated_from_base,
+NACA_64(4)-221_v4,NACA_64(4)-221,4,generated_variant,generated_from_base,
+NACA_64(4)-221_v5,NACA_64(4)-221,5,generated_variant,generated_from_base,
+NACA_64(4)-421_v1,NACA_64(4)-421,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64(4)-421_v2,NACA_64(4)-421,2,generated_variant,generated_from_base,
+NACA_64(4)-421_v3,NACA_64(4)-421,3,generated_variant,generated_from_base,
+NACA_64(4)-421_v4,NACA_64(4)-421,4,generated_variant,generated_from_base,
+NACA_64(4)-421_v5,NACA_64(4)-421,5,generated_variant,generated_from_base,
+NACA_64-206_v1,NACA_64-206,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64-206_v2,NACA_64-206,2,generated_variant,generated_from_base,
+NACA_64-206_v3,NACA_64-206,3,generated_variant,generated_from_base,
+NACA_64-206_v4,NACA_64-206,4,generated_variant,generated_from_base,
+NACA_64-206_v5,NACA_64-206,5,generated_variant,generated_from_base,
+NACA_64-208_v1,NACA_64-208,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64-208_v2,NACA_64-208,2,generated_variant,generated_from_base,
+NACA_64-208_v3,NACA_64-208,3,generated_variant,generated_from_base,
+NACA_64-208_v4,NACA_64-208,4,generated_variant,generated_from_base,
+NACA_64-208_v5,NACA_64-208,5,generated_variant,generated_from_base,
+NACA_64-209_v1,NACA_64-209,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64-209_v2,NACA_64-209,2,generated_variant,generated_from_base,
+NACA_64-209_v3,NACA_64-209,3,generated_variant,generated_from_base,
+NACA_64-209_v4,NACA_64-209,4,generated_variant,generated_from_base,
+NACA_64-209_v5,NACA_64-209,5,generated_variant,generated_from_base,
+NACA_64-210_v1,NACA_64-210,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64-210_v2,NACA_64-210,2,generated_variant,generated_from_base,
+NACA_64-210_v3,NACA_64-210,3,generated_variant,generated_from_base,
+NACA_64-210_v4,NACA_64-210,4,generated_variant,generated_from_base,
+NACA_64-210_v5,NACA_64-210,5,generated_variant,generated_from_base,
+NACA_6412_v1,NACA_6412,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_6412_v2,NACA_6412,2,generated_variant,generated_from_base,
+NACA_6412_v3,NACA_6412,3,generated_variant,generated_from_base,
+NACA_6412_v4,NACA_6412,4,generated_variant,generated_from_base,
+NACA_6412_v5,NACA_6412,5,generated_variant,generated_from_base,
+NACA_64A-010_10.0%_v1,NACA_64A-010_10.0%,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64A-010_10.0%_v2,NACA_64A-010_10.0%,2,generated_variant,generated_from_base,
+NACA_64A-010_10.0%_v3,NACA_64A-010_10.0%,3,generated_variant,generated_from_base,
+NACA_64A-010_10.0%_v4,NACA_64A-010_10.0%,4,generated_variant,generated_from_base,
+NACA_64A-010_10.0%_v5,NACA_64A-010_10.0%,5,generated_variant,generated_from_base,
+NACA_64A210_v1,NACA_64A210,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64A210_v2,NACA_64A210,2,generated_variant,generated_from_base,
+NACA_64A210_v3,NACA_64A210,3,generated_variant,generated_from_base,
+NACA_64A210_v4,NACA_64A210,4,generated_variant,generated_from_base,
+NACA_64A210_v5,NACA_64A210,5,generated_variant,generated_from_base,
+NACA_64A410_v1,NACA_64A410,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_64A410_v2,NACA_64A410,2,generated_variant,generated_from_base,
+NACA_64A410_v3,NACA_64A410,3,generated_variant,generated_from_base,
+NACA_64A410_v4,NACA_64A410,4,generated_variant,generated_from_base,
+NACA_64A410_v5,NACA_64A410,5,generated_variant,generated_from_base,
+NACA_65(1)-212_v1,NACA_65(1)-212,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(1)-212_v2,NACA_65(1)-212,2,generated_variant,generated_from_base,
+NACA_65(1)-212_v3,NACA_65(1)-212,3,generated_variant,generated_from_base,
+NACA_65(1)-212_v4,NACA_65(1)-212,4,generated_variant,generated_from_base,
+NACA_65(1)-212_v5,NACA_65(1)-212,5,generated_variant,generated_from_base,
+NACA_65(1)-212_a=0.6_v1,NACA_65(1)-212_a=0.6,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(1)-212_a=0.6_v2,NACA_65(1)-212_a=0.6,2,generated_variant,generated_from_base,
+NACA_65(1)-212_a=0.6_v3,NACA_65(1)-212_a=0.6,3,generated_variant,generated_from_base,
+NACA_65(1)-212_a=0.6_v4,NACA_65(1)-212_a=0.6,4,generated_variant,generated_from_base,
+NACA_65(1)-212_a=0.6_v5,NACA_65(1)-212_a=0.6,5,generated_variant,generated_from_base,
+NACA_65(1)-412_v1,NACA_65(1)-412,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(1)-412_v2,NACA_65(1)-412,2,generated_variant,generated_from_base,
+NACA_65(1)-412_v3,NACA_65(1)-412,3,generated_variant,generated_from_base,
+NACA_65(1)-412_v4,NACA_65(1)-412,4,generated_variant,generated_from_base,
+NACA_65(1)-412_v5,NACA_65(1)-412,5,generated_variant,generated_from_base,
+NACA_65(2)-215_v1,NACA_65(2)-215,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(2)-215_v2,NACA_65(2)-215,2,generated_variant,generated_from_base,
+NACA_65(2)-215_v3,NACA_65(2)-215,3,generated_variant,generated_from_base,
+NACA_65(2)-215_v4,NACA_65(2)-215,4,generated_variant,generated_from_base,
+NACA_65(2)-215_v5,NACA_65(2)-215,5,generated_variant,generated_from_base,
+NACA_65(2)-415_v1,NACA_65(2)-415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(2)-415_v2,NACA_65(2)-415,2,generated_variant,generated_from_base,
+NACA_65(2)-415_v3,NACA_65(2)-415,3,generated_variant,generated_from_base,
+NACA_65(2)-415_v4,NACA_65(2)-415,4,generated_variant,generated_from_base,
+NACA_65(2)-415_v5,NACA_65(2)-415,5,generated_variant,generated_from_base,
+NACA_65(2)-415_a=0.5_v1,NACA_65(2)-415_a=0.5,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(2)-415_a=0.5_v2,NACA_65(2)-415_a=0.5,2,generated_variant,generated_from_base,
+NACA_65(2)-415_a=0.5_v3,NACA_65(2)-415_a=0.5,3,generated_variant,generated_from_base,
+NACA_65(2)-415_a=0.5_v4,NACA_65(2)-415_a=0.5,4,generated_variant,generated_from_base,
+NACA_65(2)-415_a=0.5_v5,NACA_65(2)-415_a=0.5,5,generated_variant,generated_from_base,
+NACA_65(3)-218_v1,NACA_65(3)-218,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(3)-218_v2,NACA_65(3)-218,2,generated_variant,generated_from_base,
+NACA_65(3)-218_v3,NACA_65(3)-218,3,generated_variant,generated_from_base,
+NACA_65(3)-218_v4,NACA_65(3)-218,4,generated_variant,generated_from_base,
+NACA_65(3)-218_v5,NACA_65(3)-218,5,generated_variant,generated_from_base,
+NACA_65(3)-618_v1,NACA_65(3)-618,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(3)-618_v2,NACA_65(3)-618,2,generated_variant,generated_from_base,
+NACA_65(3)-618_v3,NACA_65(3)-618,3,generated_variant,generated_from_base,
+NACA_65(3)-618_v4,NACA_65(3)-618,4,generated_variant,generated_from_base,
+NACA_65(3)-618_v5,NACA_65(3)-618,5,generated_variant,generated_from_base,
+NACA_65(4)-221_v1,NACA_65(4)-221,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(4)-221_v2,NACA_65(4)-221,2,generated_variant,generated_from_base,
+NACA_65(4)-221_v3,NACA_65(4)-221,3,generated_variant,generated_from_base,
+NACA_65(4)-221_v4,NACA_65(4)-221,4,generated_variant,generated_from_base,
+NACA_65(4)-221_v5,NACA_65(4)-221,5,generated_variant,generated_from_base,
+NACA_65(4)-421_v1,NACA_65(4)-421,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(4)-421_v2,NACA_65(4)-421,2,generated_variant,generated_from_base,
+NACA_65(4)-421_v3,NACA_65(4)-421,3,generated_variant,generated_from_base,
+NACA_65(4)-421_v4,NACA_65(4)-421,4,generated_variant,generated_from_base,
+NACA_65(4)-421_v5,NACA_65(4)-421,5,generated_variant,generated_from_base,
+NACA_65(4)-421_a=0.5_v1,NACA_65(4)-421_a=0.5,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65(4)-421_a=0.5_v2,NACA_65(4)-421_a=0.5,2,generated_variant,generated_from_base,
+NACA_65(4)-421_a=0.5_v3,NACA_65(4)-421_a=0.5,3,generated_variant,generated_from_base,
+NACA_65(4)-421_a=0.5_v4,NACA_65(4)-421_a=0.5,4,generated_variant,generated_from_base,
+NACA_65(4)-421_a=0.5_v5,NACA_65(4)-421_a=0.5,5,generated_variant,generated_from_base,
+NACA_65-206_v1,NACA_65-206,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65-206_v2,NACA_65-206,2,generated_variant,generated_from_base,
+NACA_65-206_v3,NACA_65-206,3,generated_variant,generated_from_base,
+NACA_65-206_v4,NACA_65-206,4,generated_variant,generated_from_base,
+NACA_65-206_v5,NACA_65-206,5,generated_variant,generated_from_base,
+NACA_65-209_v1,NACA_65-209,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65-209_v2,NACA_65-209,2,generated_variant,generated_from_base,
+NACA_65-209_v3,NACA_65-209,3,generated_variant,generated_from_base,
+NACA_65-209_v4,NACA_65-209,4,generated_variant,generated_from_base,
+NACA_65-209_v5,NACA_65-209,5,generated_variant,generated_from_base,
+NACA_65-210_v1,NACA_65-210,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65-210_v2,NACA_65-210,2,generated_variant,generated_from_base,
+NACA_65-210_v3,NACA_65-210,3,generated_variant,generated_from_base,
+NACA_65-210_v4,NACA_65-210,4,generated_variant,generated_from_base,
+NACA_65-210_v5,NACA_65-210,5,generated_variant,generated_from_base,
+NACA_65-410_v1,NACA_65-410,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_65-410_v2,NACA_65-410,2,generated_variant,generated_from_base,
+NACA_65-410_v3,NACA_65-410,3,generated_variant,generated_from_base,
+NACA_65-410_v4,NACA_65-410,4,generated_variant,generated_from_base,
+NACA_65-410_v5,NACA_65-410,5,generated_variant,generated_from_base,
+NACA_66(1)-212_v1,NACA_66(1)-212,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(1)-212_v2,NACA_66(1)-212,2,generated_variant,generated_from_base,
+NACA_66(1)-212_v3,NACA_66(1)-212,3,generated_variant,generated_from_base,
+NACA_66(1)-212_v4,NACA_66(1)-212,4,generated_variant,generated_from_base,
+NACA_66(1)-212_v5,NACA_66(1)-212,5,generated_variant,generated_from_base,
+NACA_66(2)-215_v1,NACA_66(2)-215,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(2)-215_v2,NACA_66(2)-215,2,generated_variant,generated_from_base,
+NACA_66(2)-215_v3,NACA_66(2)-215,3,generated_variant,generated_from_base,
+NACA_66(2)-215_v4,NACA_66(2)-215,4,generated_variant,generated_from_base,
+NACA_66(2)-215_v5,NACA_66(2)-215,5,generated_variant,generated_from_base,
+NACA_66(2)-415_v1,NACA_66(2)-415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(2)-415_v2,NACA_66(2)-415,2,generated_variant,generated_from_base,
+NACA_66(2)-415_v3,NACA_66(2)-415,3,generated_variant,generated_from_base,
+NACA_66(2)-415_v4,NACA_66(2)-415,4,generated_variant,generated_from_base,
+NACA_66(2)-415_v5,NACA_66(2)-415,5,generated_variant,generated_from_base,
+NACA_66(3)-218_v1,NACA_66(3)-218,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(3)-218_v2,NACA_66(3)-218,2,generated_variant,generated_from_base,
+NACA_66(3)-218_v3,NACA_66(3)-218,3,generated_variant,generated_from_base,
+NACA_66(3)-218_v4,NACA_66(3)-218,4,generated_variant,generated_from_base,
+NACA_66(3)-218_v5,NACA_66(3)-218,5,generated_variant,generated_from_base,
+NACA_66(3)-418_v1,NACA_66(3)-418,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(3)-418_v2,NACA_66(3)-418,2,generated_variant,generated_from_base,
+NACA_66(3)-418_v3,NACA_66(3)-418,3,generated_variant,generated_from_base,
+NACA_66(3)-418_v4,NACA_66(3)-418,4,generated_variant,generated_from_base,
+NACA_66(3)-418_v5,NACA_66(3)-418,5,generated_variant,generated_from_base,
+NACA_66(4)-221_v1,NACA_66(4)-221,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66(4)-221_v2,NACA_66(4)-221,2,generated_variant,generated_from_base,
+NACA_66(4)-221_v3,NACA_66(4)-221,3,generated_variant,generated_from_base,
+NACA_66(4)-221_v4,NACA_66(4)-221,4,generated_variant,generated_from_base,
+NACA_66(4)-221_v5,NACA_66(4)-221,5,generated_variant,generated_from_base,
+NACA_66-018_v1,NACA_66-018,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66-018_v2,NACA_66-018,2,generated_variant,generated_from_base,
+NACA_66-018_v3,NACA_66-018,3,generated_variant,generated_from_base,
+NACA_66-018_v4,NACA_66-018,4,generated_variant,generated_from_base,
+NACA_66-018_v5,NACA_66-018,5,generated_variant,generated_from_base,
+NACA_66-206_v1,NACA_66-206,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66-206_v2,NACA_66-206,2,generated_variant,generated_from_base,
+NACA_66-206_v3,NACA_66-206,3,generated_variant,generated_from_base,
+NACA_66-206_v4,NACA_66-206,4,generated_variant,generated_from_base,
+NACA_66-206_v5,NACA_66-206,5,generated_variant,generated_from_base,
+NACA_66-209_v1,NACA_66-209,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66-209_v2,NACA_66-209,2,generated_variant,generated_from_base,
+NACA_66-209_v3,NACA_66-209,3,generated_variant,generated_from_base,
+NACA_66-209_v4,NACA_66-209,4,generated_variant,generated_from_base,
+NACA_66-209_v5,NACA_66-209,5,generated_variant,generated_from_base,
+NACA_66-210_v1,NACA_66-210,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_66-210_v2,NACA_66-210,2,generated_variant,generated_from_base,
+NACA_66-210_v3,NACA_66-210,3,generated_variant,generated_from_base,
+NACA_66-210_v4,NACA_66-210,4,generated_variant,generated_from_base,
+NACA_66-210_v5,NACA_66-210,5,generated_variant,generated_from_base,
+"NACA_67,1-215_v1","NACA_67,1-215",1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+"NACA_67,1-215_v2","NACA_67,1-215",2,generated_variant,generated_from_base,
+"NACA_67,1-215_v3","NACA_67,1-215",3,generated_variant,generated_from_base,
+"NACA_67,1-215_v4","NACA_67,1-215",4,generated_variant,generated_from_base,
+"NACA_67,1-215_v5","NACA_67,1-215",5,generated_variant,generated_from_base,
+NACA_747A315_v1,NACA_747A315,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_747A315_v2,NACA_747A315,2,generated_variant,generated_from_base,
+NACA_747A315_v3,NACA_747A315,3,generated_variant,generated_from_base,
+NACA_747A315_v4,NACA_747A315,4,generated_variant,generated_from_base,
+NACA_747A315_v5,NACA_747A315,5,generated_variant,generated_from_base,
+NACA_747A415_v1,NACA_747A415,1,imported_raw,UIUC Airfoil Coordinates Database,https://m-selig.ae.illinois.edu/ads/coord_database.html
+NACA_747A415_v2,NACA_747A415,2,generated_variant,generated_from_base,
+NACA_747A415_v3,NACA_747A415,3,generated_variant,generated_from_base,
+NACA_747A415_v4,NACA_747A415,4,generated_variant,generated_from_base,
+NACA_747A415_v5,NACA_747A415,5,generated_variant,generated_from_base,
