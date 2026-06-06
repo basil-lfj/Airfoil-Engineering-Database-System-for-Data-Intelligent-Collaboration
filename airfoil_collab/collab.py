@@ -212,6 +212,79 @@ def explain_result(cfg: AppConfig, *, question: str, sql: str, csv_text: str) ->
     return explanation
 
 
+def audit_explanation(
+    explanation: str,
+    csv_text: str,
+    question: str,
+) -> tuple[str, list[str]]:
+    """对结果解释进行程序化审计，返回 (judgement, issues)。"""
+    import re
+
+    judgement: str = "correct"
+    issues: list[str] = []
+
+    # 1. 解释是否空白/过于简短（明显未基于结果）
+    if not explanation or len(explanation.strip()) < 10:
+        return ("unsupported", ["not_grounded_in_result"])
+
+    # 2. 提取结果中的数值集合（含列名中的数字），用于检测幻觉
+    csv_numbers: set[str] = set()
+    csv_codes: set[str] = set()
+    for line in csv_text.splitlines():
+        # 提取翼型编号 (NACAxxxx)
+        for m in re.finditer(r"NACA\d{4}", line, re.IGNORECASE):
+            csv_codes.add(m.group().upper())
+        # 提取浮点数（保留 4 位以内精度用于匹配）
+        for m in re.finditer(r"\d+\.\d+", line):
+            csv_numbers.add(m.group())
+        for m in re.finditer(r"\b\d+\b", line):
+            csv_numbers.add(m.group())
+
+    # 3. 提取解释中的翼型编号
+    explained_codes = set(re.findall(r"NACA\d{4}", explanation, re.IGNORECASE))
+    question_codes = set(re.findall(r"NACA\d{4}", question, re.IGNORECASE))
+    fabricated_codes = explained_codes - csv_codes - {c.upper() for c in question_codes}
+    if fabricated_codes:
+        issues.append("fabricated_missing_info")
+
+    # 4. 检查解释是否引用了结果中的具体数值
+    has_grounded_number = any(num in explanation for num in csv_numbers if len(num) >= 3)
+
+    # 5. 检查严重工程常识违规关键词
+    suspicious_phrases = [
+        ("负阻力", "engineering_common_sense_violation"),
+        ("升力系数为零", "hallucination_plausible_but_wrong"),
+        ("无限升阻比", "engineering_common_sense_violation"),
+    ]
+    for phrase, issue_type in suspicious_phrases:
+        if phrase in explanation:
+            if issue_type not in issues:
+                issues.append(issue_type)
+
+    # 6. 如果 CSV 为空（只有 header），解释却说有具体发现
+    csv_data_lines = [l for l in csv_text.splitlines()[1:] if l.strip()]
+    if not csv_data_lines:
+        if any(kw in explanation for kw in ["发现", "表明", "显示", "可以看出", "数值为"]):
+            issues.append("fabricated_missing_info")
+        if not any(kw in explanation for kw in ["无法判断", "无数据", "没有", "为空", "未找到"]):
+            issues.append("not_grounded_in_result")
+    else:
+        if not has_grounded_number:
+            issues.append("not_grounded_in_result")
+
+    # 7. 综合判定
+    if "fabricated_missing_info" in issues:
+        judgement = "incorrect"
+    elif "engineering_common_sense_violation" in issues:
+        judgement = "incorrect"
+    elif "not_grounded_in_result" in issues and "hallucination_plausible_but_wrong" in issues:
+        judgement = "incorrect"
+    elif issues:
+        judgement = "unsupported"
+
+    return (judgement, issues)
+
+
 def run_once(
     cfg: AppConfig,
     *,
@@ -371,14 +444,19 @@ def run_once(
     if do_explain:
         try:
             explanation_text = explain_result(cfg, question=question, sql=exec_sql, csv_text=csv_out)
+            exp_judgement, exp_issues = audit_explanation(
+                explanation=explanation_text,
+                csv_text=csv_out,
+                question=question,
+            )
             _insert_result_explain_audit(
                 cfg,
                 query_id=query_id,
                 reviewer_id=user_id,
                 snapshot_ref=str(snapshot_path),
                 explanation=explanation_text,
-                judgement="unsupported",
-                issues=[],
+                judgement=exp_judgement,
+                issues=exp_issues,
             )
         except DeepSeekError:
             explanation_text = None

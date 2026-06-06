@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "E01",
+      "source_case": "P03",
+      "description": "升阻比Top10结果解释——应引用具体数值",
+      "question": "在 Re=3000000、攻角 α=2 条件下，列出升阻比最高的前 10 个翼型（只看当前有效版本）。",
+      "schema_mode": "strong",
+      "check_grounded": true,
+      "check_no_fabrication": true
+    },
+    {
+      "id": "E02",
+      "source_case": "P08",
+      "description": "分组统计结果解释——应引用具体计数",
+      "question": "统计每个性能记录来源类型（source_type）下的记录数量与异常数量。",
+      "schema_mode": "strong",
+      "check_grounded": true,
+      "check_no_fabrication": true
+    },
+    {
+      "id": "E03",
+      "source_case": "P09",
+      "description": "异常翼型列表解释——应符合工程常识",
+      "question": "列出存在异常提示的翼型（异常记录/性能异常/负 Cd 任一命中），只看当前有效版本，并按异常提示数降序。",
+      "schema_mode": "strong",
+      "check_engineering_sense": true,
+      "check_grounded": true
+    },
+    {
+      "id": "E04",
+      "source_case": "P04",
+      "description": "单翼型曲线数据解释——应描述趋势而非虚构",
+      "question": "查询翼型编号为 NACA2412 在 Re=3000000 下不同攻角的 Cl、Cd 曲线点，按攻角升序。",
+      "schema_mode": "strong",
+      "check_grounded": true,
+      "check_no_fabrication": true
+    },
+    {
+      "id": "E05",
+      "source_case": "P07",
+      "description": "版本差异解释——应引用delta值",
+      "question": "对比翼型编号为 NACA0012 的版本 1 与版本 2 在 Re=3000000、α=2 条件下的 Cd 差异（delta_cd）。",
+      "schema_mode": "strong",
+      "check_grounded": true,
+      "check_no_fabrication": true
+    },
+    {
+      "id": "E06",
+      "source_case": "none",
+      "description": "空结果对抗测试——不应虚构信息",
+      "question": "查询翼型编号为 NACA9999 的当前有效版本信息。",
+      "schema_mode": "strong",
+      "check_empty_result": true,
+      "check_no_fabrication": true
+    },
+    {
+      "id": "E07",
+      "source_case": "none",
+      "description": "模糊问题降级测试——应说明无法判断",
+      "question": "帮我找一个最好的翼型。",
+      "schema_mode": "strong",
+      "check_ambiguous": true
+    }
+  ]
+}

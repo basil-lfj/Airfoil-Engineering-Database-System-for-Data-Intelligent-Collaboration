@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .collab import bootstrap_db, run_once
 from .config import load_app_config
-from .eval import run_eval
+from .eval import run_eval, run_explain_eval
 
 
 def _cmd_bootstrap(args: argparse.Namespace) -> int:
@@ -49,6 +49,29 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return 0 if out.audit.audit_status == "approved" else 2
 
 
+def _cmd_eval(args: argparse.Namespace) -> int:
+    cfg = load_app_config()
+    summary = run_eval(cfg, Path(args.cases))
+    sys.stdout.write(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
+    return 0 if summary.get("failed") == 0 else 2
+
+
+def _cmd_explain_eval(args: argparse.Namespace) -> int:
+    cfg = load_app_config()
+    summary = run_explain_eval(cfg, Path(args.cases))
+    sys.stdout.write(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
+    return 0
+
+
+def _cmd_anomaly_compare(args: argparse.Namespace) -> int:
+    from .anomaly_compare import run_anomaly_compare
+
+    cfg = load_app_config()
+    result = run_anomaly_compare(cfg, sample_size=args.sample_size)
+    sys.stdout.write(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="airfoil-collab", add_help=True)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -75,6 +98,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_eval.set_defaults(func=_cmd_eval)
 
+    p_explain_eval = sub.add_parser("explain-eval", help="evaluate result explanation audit")
+    p_explain_eval.add_argument(
+        "--cases",
+        default=str(Path("数据智能协同") / "explain_test_cases.json"),
+        help="path to explain test cases json",
+    )
+    p_explain_eval.set_defaults(func=_cmd_explain_eval)
+
+    p_anomaly = sub.add_parser("anomaly-compare", help="rule vs llm anomaly detection comparison")
+    p_anomaly.add_argument("--sample-size", type=int, default=100, help="number of records to sample")
+    p_anomaly.set_defaults(func=_cmd_anomaly_compare)
+
     return p
 
 
@@ -82,10 +117,3 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     ns = parser.parse_args(argv)
     return int(ns.func(ns))
-
-
-def _cmd_eval(args: argparse.Namespace) -> int:
-    cfg = load_app_config()
-    summary = run_eval(cfg, Path(args.cases))
-    sys.stdout.write(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
-    return 0 if summary.get("failed") == 0 else 2

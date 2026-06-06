@@ -35,7 +35,7 @@ def run_psql(
         env["PGPASSWORD"] = pg.password
 
     args: list[str] = [
-        "psql",
+        pg.psql_path,
         "-h",
         pg.host,
         "-p",
@@ -57,20 +57,35 @@ def run_psql(
     if no_align:
         args.append("-A")
 
-    args.extend(["-c", sql])
+    # 使用临时文件传 SQL，避免 Windows 命令行编码问题
+    with NamedTemporaryFile("w", suffix=".sql", delete=False, encoding="utf-8") as f:
+        f.write(sql)
+        temp_path = Path(f.name)
 
     try:
+        args.extend(["-f", str(temp_path)])
         proc = subprocess.run(
             args,
             input="",
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             env=env,
             timeout=timeout_s,
             cwd=str(Path.cwd()),
         )
     except subprocess.TimeoutExpired as e:
+        try:
+            temp_path.unlink(missing_ok=True)
+        except Exception:
+            pass
         raise PsqlError(f"psql timeout after {timeout_s}s") from e
+    finally:
+        try:
+            temp_path.unlink(missing_ok=True)
+        except Exception:
+            pass
 
     res = PsqlResult(returncode=proc.returncode, stdout=proc.stdout, stderr=proc.stderr)
     if res.returncode != 0:
@@ -90,7 +105,7 @@ def run_psql_file(
         env["PGPASSWORD"] = pg.password
 
     args: list[str] = [
-        "psql",
+        pg.psql_path,
         "-h",
         pg.host,
         "-p",
@@ -117,6 +132,8 @@ def run_psql_file(
             args,
             input="",
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             env=env,
             timeout=timeout_s,

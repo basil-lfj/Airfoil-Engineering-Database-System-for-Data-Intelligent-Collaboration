@@ -14,6 +14,7 @@ class PostgresConfig:
     dbname: str
     user: str
     password: str | None
+    psql_path: str = "psql"
 
 
 @dataclass(frozen=True)
@@ -33,6 +34,7 @@ class AppConfig:
     postgres: PostgresConfig
     deepseek: DeepSeekConfig
     project_root: Path
+    psql_path: str
 
 
 def load_app_config(project_root: Path | None = None) -> AppConfig:
@@ -62,8 +64,9 @@ def load_app_config(project_root: Path | None = None) -> AppConfig:
     base_url = (env.get("DEEPSEEK_BASE_URL") or env.get("BASE_URL") or "").strip()
     api_key = (env.get("DEEPSEEK_API_KEY") or env.get("API_KEY") or "").strip()
     model = (env.get("DEEPSEEK_MODEL") or "deepseek-v3.2").strip()
+    psql_path = (env.get("PSQL_PATH") or "psql").strip()
 
-    postgres = PostgresConfig(host=host, port=port, dbname=dbname, user=user, password=password or None)
+    postgres = PostgresConfig(host=host, port=port, dbname=dbname, user=user, password=password or None, psql_path=psql_path)
     deepseek = DeepSeekConfig(
         base_url=base_url,
         api_key=api_key,
@@ -75,5 +78,5 @@ def load_app_config(project_root: Path | None = None) -> AppConfig:
         max_retries=int(env.get("DEEPSEEK_MAX_RETRIES") or 2),
     )
 
-    return AppConfig(postgres=postgres, deepseek=deepseek, project_root=root)
+    return AppConfig(postgres=postgres, deepseek=deepseek, project_root=root, psql_path=psql_path)
 
