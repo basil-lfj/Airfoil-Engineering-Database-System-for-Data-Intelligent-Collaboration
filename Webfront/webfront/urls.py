@@ -11,4 +11,6 @@ urlpatterns = [
     path('compare/', views.compare_airfoils, name='compare_airfoils'),
     path('anomalies/', views.anomaly_list, name='anomaly_list'),
     path('visualize/', views.visualize, name='visualize'),
+    path('nl2sql/', views.nl2sql, name='nl2sql'),
+    path('nl2sql/api/', views.nl2sql_api, name='nl2sql_api'),
 ]

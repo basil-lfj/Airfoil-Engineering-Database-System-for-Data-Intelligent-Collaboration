@@ -1,0 +1,250 @@
+{% extends 'webfront/base.html' %}
+{% block title %}智能查询 · 翼型工程数据库{% endblock %}
+{% block content %}
+
+<div class="page-title">
+    <h1>智能查询 ✦ NL2SQL</h1>
+    <p>用自然语言描述查询需求，AI 自动生成 SQL、执行查询并给出解读</p>
+</div>
+
+<div class="card" style="border-color: var(--accent);">
+    <div style="display:flex;gap:0.5rem;align-items:stretch;">
+        <input type="text" id="questionInput"
+               placeholder="例如：查询翼型编号为 NACA2412 的当前有效版本号与创建时间"
+               style="flex:1;min-width:0;padding:0.6rem 0.85rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.9rem;font-family:var(--font-sans);background:var(--surface);color:var(--ink);outline:none;">
+        <select id="schemaSelect" style="padding:0.6rem 0.85rem;border:1px solid var(--border);border-radius:var(--radius);font-size:0.85rem;background:var(--surface);color:var(--ink);outline:none;">
+            <option value="strong">精确模式</option>
+            <option value="weak">宽松模式</option>
+        </select>
+        <button id="submitBtn" class="btn btn-primary" style="padding:0.6rem 1.2rem;font-size:0.9rem;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            查询
+        </button>
+    </div>
+
+    <!-- 快速问题模板 -->
+    <div style="margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center;">
+        <span style="font-size:0.75rem;color:var(--ink-tertiary);">快速示例：</span>
+        <button class="btn btn-sm quick-q">查询 NACA2412 的当前有效版本</button>
+        <button class="btn btn-sm quick-q">Re=3000000 升阻比最高的前 10 个翼型</button>
+        <button class="btn btn-sm quick-q">查询 NACA0012 的上表面坐标点</button>
+        <button class="btn btn-sm quick-q">列出存在异常提示的翼型</button>
+    </div>
+</div>
+
+<!-- 加载状态 -->
+<div id="loadingIndicator" style="display:none;text-align:center;padding:2rem;color:var(--ink-secondary);">
+    <div style="display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--ink);border-radius:50%;animation:spin 0.7s linear infinite;margin-bottom:0.5rem;"></div>
+    <div style="font-size:0.85rem;">正在生成 SQL 并查询…</div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
+<!-- 结果区域 -->
+<div id="resultArea" style="display:none;">
+
+    <!-- 审计状态 -->
+    <div id="auditBanner" class="alert" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <span id="auditIcon" style="font-size:1.1rem;"></span>
+            <span id="auditLabel" style="font-weight:500;"></span>
+        </div>
+        <code id="queryIdDisplay" style="font-size:0.72rem;color:var(--ink-tertiary);font-family:var(--font-mono);"></code>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+
+        <!-- 生成的 SQL -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h2>生成的 SQL</h2>
+                <button id="copySqlBtn" class="btn btn-sm">复制</button>
+            </div>
+            <pre id="sqlDisplay" style="background:var(--gray-light);padding:1rem;border-radius:var(--radius);font-family:var(--font-mono);font-size:0.78rem;line-height:1.6;overflow-x:auto;min-height:60px;margin:0;white-space:pre-wrap;"></pre>
+        </div>
+
+        <!-- 智能解读 -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h2>智能解读</h2>
+                <span id="explainJudgement" class="tag"></span>
+            </div>
+            <div id="explainDisplay" style="font-size:0.85rem;line-height:1.7;color:var(--ink);min-height:60px;"></div>
+        </div>
+    </div>
+
+    <!-- 结果表格 -->
+    <div class="card" style="margin-top:1rem;">
+        <div class="card-header">
+            <h2>查询结果</h2>
+            <span id="rowCount" class="count"></span>
+        </div>
+        <div id="tableWrapper" style="overflow-x:auto;">
+            <table id="resultTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div id="emptyResult" style="display:none;text-align:center;padding:2rem;color:var(--ink-tertiary);font-size:0.85rem;">无结果</div>
+        </div>
+    </div>
+
+    <!-- 错误信息 -->
+    <div id="errorTypesDisplay" class="card" style="display:none;border-color:var(--red);">
+        <div class="card-header">
+            <h2 style="color:var(--red);">审计拦截详情</h2>
+        </div>
+        <div id="errorDetail" style="font-size:0.85rem;line-height:1.7;"></div>
+    </div>
+</div>
+
+<div id="errorDisplay" class="alert" style="display:none; border-color:var(--red); color:var(--red); background:var(--red-light);"></div>
+
+<script>
+const questionInput = document.getElementById('questionInput');
+const schemaSelect = document.getElementById('schemaSelect');
+const submitBtn = document.getElementById('submitBtn');
+const loadingIndicator = document.getElementById('loadingIndicator');
+const resultArea = document.getElementById('resultArea');
+const errorDisplay = document.getElementById('errorDisplay');
+
+async function submitQuery() {
+    const question = questionInput.value.trim();
+    if (!question) { questionInput.focus(); return; }
+
+    // Reset UI
+    resultArea.style.display = 'none';
+    errorDisplay.style.display = 'none';
+    loadingIndicator.style.display = 'block';
+    submitBtn.disabled = true;
+    submitBtn.textContent = '查询中…';
+
+    const schemaMode = schemaSelect.value;
+
+    try {
+        const resp = await fetch('{% url "webfront:nl2sql_api" %}?q=' + encodeURIComponent(question) + '&schema_mode=' + schemaMode);
+        const data = await resp.json();
+
+        loadingIndicator.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 查询';
+
+        if (data.error) {
+            errorDisplay.textContent = data.error;
+            errorDisplay.style.display = 'block';
+            return;
+        }
+
+        renderResult(data, question);
+    } catch (err) {
+        loadingIndicator.style.display = 'none';
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> 查询';
+        errorDisplay.textContent = '网络请求失败: ' + err.message;
+        errorDisplay.style.display = 'block';
+    }
+}
+
+function renderResult(data, question) {
+    // 审计状态
+    const status = data.audit_status;
+    const banner = document.getElementById('auditBanner');
+    const icon = document.getElementById('auditIcon');
+    const label = document.getElementById('auditLabel');
+    const errorTypesDisplay = document.getElementById('errorTypesDisplay');
+
+    if (status === 'approved') {
+        banner.className = 'alert alert-info';
+        icon.textContent = '✅';
+        label.textContent = '通过审计 — SQL 已执行';
+    } else if (status === 'needs_fix') {
+        banner.className = 'alert alert-warn';
+        icon.textContent = '⚠️';
+        label.textContent = '需要修正 — ' + (data.notes || '存在可修复问题');
+    } else {
+        banner.className = 'alert';
+        banner.style.borderColor = 'var(--red)';
+        banner.style.color = 'var(--red)';
+        icon.textContent = '❌';
+        label.textContent = '已拒绝 — ' + (data.notes || '不可执行');
+    }
+    document.getElementById('queryIdDisplay').textContent = 'ID: ' + (data.query_id || '-');
+
+    // SQL
+    const sqlDisplay = document.getElementById('sqlDisplay');
+    sqlDisplay.textContent = data.executed_sql || (status === 'rejected' ? '(审计拦截，未执行 SQL)' : '(无 SQL 生成)');
+
+    // 智能解读
+    const explainDisplay = document.getElementById('explainDisplay');
+    const explainJudgement = document.getElementById('explainJudgement');
+    if (data.explanation_text) {
+        explainDisplay.textContent = data.explanation_text;
+        explainJudgement.textContent = '已解读';
+        explainJudgement.className = 'tag tag-green';
+    } else {
+        explainDisplay.textContent = '(未生成解读)';
+        explainJudgement.textContent = '无';
+        explainJudgement.className = 'tag tag-gray';
+    }
+
+    // 结果表格
+    const thead = document.getElementById('tableHead');
+    const tbody = document.getElementById('tableBody');
+    const emptyResult = document.getElementById('emptyResult');
+    const rowCount = document.getElementById('rowCount');
+    const tableWrapper = document.getElementById('tableWrapper');
+
+    if (data.columns && data.columns.length > 0 && data.rows && data.rows.length > 0) {
+        thead.innerHTML = '<tr>' + data.columns.map(c => '<th>' + c + '</th>').join('') + '</tr>';
+        tbody.innerHTML = data.rows.map(r =>
+            '<tr>' + data.columns.map(c => '<td>' + (r[c] !== undefined ? r[c] : '') + '</td>').join('') + '</tr>'
+        ).join('');
+        emptyResult.style.display = 'none';
+        tableWrapper.style.display = '';
+        rowCount.textContent = data.row_count + ' 行';
+    } else {
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+        emptyResult.style.display = 'block';
+        tableWrapper.style.display = 'none';
+        rowCount.textContent = '0 行';
+    }
+
+    // 错误类型
+    if (data.error_types && data.error_types.length > 0) {
+        errorTypesDisplay.style.display = 'block';
+        document.getElementById('errorDetail').innerHTML =
+            '<ul style="margin:0;padding-left:1.2rem;">' +
+            data.error_types.map(e => '<li><code>' + e + '</code></li>').join('') +
+            '</ul>' +
+            (data.notes ? '<p style="margin-top:0.5rem;">备注: ' + data.notes + '</p>' : '');
+    } else {
+        errorTypesDisplay.style.display = 'none';
+    }
+
+    resultArea.style.display = 'block';
+}
+
+// 复制 SQL
+document.getElementById('copySqlBtn').addEventListener('click', function() {
+    const sql = document.getElementById('sqlDisplay').textContent;
+    navigator.clipboard.writeText(sql);
+    this.textContent = '已复制';
+    setTimeout(() => { this.textContent = '复制'; }, 1500);
+});
+
+// 回车提交
+questionInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitQuery(); }
+});
+
+// 提交按钮
+submitBtn.addEventListener('click', submitQuery);
+
+// 快速问答按钮
+document.querySelectorAll('.quick-q').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        questionInput.value = this.textContent;
+        submitQuery();
+    });
+});
+</script>
+{% endblock %}

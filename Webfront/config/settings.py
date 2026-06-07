@@ -10,10 +10,16 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# ── 将 AEDS 根目录加入 sys.path，以便 import airfoil_collab ──
+AEDS_ROOT = BASE_DIR.parent
+if str(AEDS_ROOT) not in sys.path:
+    sys.path.insert(0, str(AEDS_ROOT))
 
 
 # Quick-start development settings - unsuitable for production

@@ -288,6 +288,7 @@
         <a href="{% url 'webfront:compare_airfoils' %}" {% if '/compare/' in request.path %}class="active"{% endif %}>对比</a>
         <a href="{% url 'webfront:anomaly_list' %}" {% if '/anomalies/' in request.path %}class="active"{% endif %}>异常</a>
         <a href="{% url 'webfront:visualize' %}" {% if '/visualize/' in request.path %}class="active"{% endif %}>可视化</a>
+        <a href="{% url 'webfront:nl2sql' %}" {% if '/nl2sql/' in request.path %}class="active"{% endif %}>智能查询 ✦</a>
     </nav>
     <main class="container">
         {% block content %}{% endblock %}

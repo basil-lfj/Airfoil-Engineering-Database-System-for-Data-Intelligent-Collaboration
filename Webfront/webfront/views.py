@@ -1,5 +1,11 @@
+import logging
+
+from django.http import JsonResponse
 from django.shortcuts import render
+
 from .services import airfoil_service
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -87,3 +93,26 @@ def visualize(request):
         'top_performers': top_performers,
         'anomaly_stats': anomaly_stats,
     })
+
+
+# ── NL2SQL 智能查询 ──────────────────────────────────────────────────
+
+def nl2sql(request):
+    """NL2SQL 主页面"""
+    return render(request, 'webfront/nl2sql.html')
+
+
+def nl2sql_api(request):
+    """AJAX API：自然语言 → SQL → 执行 → 解释 → 返回 JSON"""
+    question = request.GET.get('q', '').strip()
+    schema_mode = request.GET.get('schema_mode', 'strong')
+    if not question:
+        return JsonResponse({'error': '请输入自然语言问题'}, status=400)
+
+    try:
+        from .services.collab_service import nl2sql_query
+        result = nl2sql_query(question, schema_mode=schema_mode)
+        return JsonResponse(result)
+    except Exception as e:
+        logger.exception('NL2SQL API 异常')
+        return JsonResponse({'error': f'服务内部错误: {str(e)[:200]}'}, status=500)
