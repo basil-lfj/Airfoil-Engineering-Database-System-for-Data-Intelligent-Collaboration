@@ -5,6 +5,10 @@
 <div class="page-title">
     <h1>智能查询 ✦ NL2SQL</h1>
     <p>用自然语言描述查询需求，AI 自动生成 SQL、执行查询并给出解读</p>
+    <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <a class="btn btn-sm" href="{% url 'webfront:nl2sql_audit_list' %}">NL2SQL 审计记录</a>
+        <a class="btn btn-sm" href="{% url 'webfront:explain_audit_list' %}">结果解释审计记录</a>
+    </div>
 </div>
 
 <!-- ── 输入区 ── -->
@@ -87,6 +91,7 @@
                 <span id="explainJudgement" class="tag"></span>
             </div>
             <div id="explainDisplay" style="font-size:0.85rem;line-height:1.7;color:var(--ink);min-height:60px;"></div>
+            <div id="explainIssues" style="margin-top:0.75rem;font-size:0.78rem;color:var(--ink-secondary);"></div>
         </div>
     </div>
 
@@ -267,14 +272,30 @@ function renderResult(data) {
     // 智能解读
     const explainDisplay = document.getElementById('explainDisplay');
     const explainJudgement = document.getElementById('explainJudgement');
+    const explainIssues = document.getElementById('explainIssues');
     if (data.explanation_text) {
         explainDisplay.textContent = data.explanation_text;
-        explainJudgement.textContent = '已解读';
-        explainJudgement.className = 'tag tag-green';
+        const j = data.explanation_judgement || 'unsupported';
+        if (j === 'correct') {
+            explainJudgement.textContent = 'correct';
+            explainJudgement.className = 'tag tag-green';
+        } else if (j === 'incorrect') {
+            explainJudgement.textContent = 'incorrect';
+            explainJudgement.className = 'tag tag-red';
+        } else {
+            explainJudgement.textContent = j;
+            explainJudgement.className = 'tag tag-amber';
+        }
+        if (data.explanation_issues && data.explanation_issues.length > 0) {
+            explainIssues.innerHTML = 'issues: ' + data.explanation_issues.map(i => '<code>' + i + '</code>').join(' ');
+        } else {
+            explainIssues.textContent = '';
+        }
     } else {
         explainDisplay.textContent = '(未生成解读)';
         explainJudgement.textContent = '无';
         explainJudgement.className = 'tag tag-gray';
+        explainIssues.textContent = '';
     }
 
     // 结果表格 + 空状态

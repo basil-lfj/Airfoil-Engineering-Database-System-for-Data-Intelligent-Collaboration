@@ -13,4 +13,8 @@ urlpatterns = [
     path('visualize/', views.visualize, name='visualize'),
     path('nl2sql/', views.nl2sql, name='nl2sql'),
     path('nl2sql/api/', views.nl2sql_api, name='nl2sql_api'),
+    path('nl2sql/audits/', views.nl2sql_audit_list, name='nl2sql_audit_list'),
+    path('nl2sql/audits/<uuid:audit_id>/', views.nl2sql_audit_detail, name='nl2sql_audit_detail'),
+    path('nl2sql/explain-audits/', views.explain_audit_list, name='explain_audit_list'),
+    path('nl2sql/explain-audits/<uuid:explain_id>/', views.explain_audit_detail, name='explain_audit_detail'),
 ]

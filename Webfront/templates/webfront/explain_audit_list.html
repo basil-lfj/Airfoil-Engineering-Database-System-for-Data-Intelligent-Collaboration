@@ -1,0 +1,54 @@
+{% extends 'webfront/base.html' %}
+{% block title %}结果解释审计记录 · 翼型工程数据库{% endblock %}
+{% block content %}
+
+<div class="page-title">
+    <h1>结果解释审计记录</h1>
+    <p>最近 200 条“结果 → 解释”的留痕与复核入口</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>解释审计列表</h2>
+        <span class="count">{{ audits|length }} 条</span>
+    </div>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>时间</th>
+                    <th>判定</th>
+                    <th>Query ID</th>
+                    <th>Issues</th>
+                    <th>快照</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in audits %}
+                <tr>
+                    <td class="link-mono">{{ a.created_at|date:"Y-m-d H:i:s" }}</td>
+                    <td>
+                        {% if a.judgement == "correct" %}
+                            <span class="tag tag-green">correct</span>
+                        {% elif a.judgement == "incorrect" %}
+                            <span class="tag tag-red">incorrect</span>
+                        {% else %}
+                            <span class="tag tag-amber">{{ a.judgement }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="link-mono">{{ a.query_id }}</td>
+                    <td class="link-mono" style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.issues_json }}</td>
+                    <td class="link-mono" style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.result_snapshot_ref }}</td>
+                    <td><a class="btn btn-sm" href="{% url 'webfront:explain_audit_detail' a.explain_id %}">查看/复核</a></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" style="color:var(--ink-tertiary);">暂无记录</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+

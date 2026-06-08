@@ -121,3 +121,51 @@ class AnomalyRecord(models.Model):
     class Meta:
         managed = False
         db_table = 'anomaly_record'
+
+
+class QueryLog(models.Model):
+    query_id = models.UUIDField(primary_key=True)
+    user = models.ForeignKey(UserAccount, models.DO_NOTHING, db_column='user_id')
+    airfoil = models.ForeignKey(Airfoil, models.DO_NOTHING, db_column='airfoil_id', blank=True, null=True)
+    query_type = models.TextField(blank=True, null=True)
+    at = models.DateTimeField(blank=True, null=True)
+    parameters_json = models.TextField(blank=True, null=True)
+    sql_text = models.TextField(blank=True, null=True)
+    is_success = models.BooleanField(blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'query_log'
+
+
+class NL2SQLAudit(models.Model):
+    audit_id = models.UUIDField(primary_key=True)
+    query = models.ForeignKey(QueryLog, models.DO_NOTHING, db_column='query_id', blank=True, null=True)
+    auditor = models.ForeignKey(UserAccount, models.DO_NOTHING, db_column='auditor_id', blank=True, null=True)
+    nl_question = models.TextField(blank=True, null=True)
+    generated_sql = models.TextField(blank=True, null=True)
+    audited_sql = models.TextField(blank=True, null=True)
+    audit_status = models.TextField(blank=True, null=True)
+    error_types_json = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'nl2sql_audit'
+
+
+class ResultExplainAudit(models.Model):
+    explain_id = models.UUIDField(primary_key=True)
+    query = models.ForeignKey(QueryLog, models.DO_NOTHING, db_column='query_id', blank=True, null=True)
+    reviewer = models.ForeignKey(UserAccount, models.DO_NOTHING, db_column='reviewer_id', blank=True, null=True)
+    result_snapshot_ref = models.TextField(blank=True, null=True)
+    llm_explanation = models.TextField(blank=True, null=True)
+    judgement = models.TextField(blank=True, null=True)
+    issues_json = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'result_explain_audit'

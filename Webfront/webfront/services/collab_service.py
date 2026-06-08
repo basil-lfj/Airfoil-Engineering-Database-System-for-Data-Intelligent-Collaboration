@@ -73,10 +73,12 @@ def nl2sql_query(
         "error_types": out.audit.error_types,
         "notes": out.audit.notes,
         "executed_sql": out.executed_sql,
-        "generated_sql": out.executed_sql,
+        "generated_sql": (out.generated.obj.get("sql") if out.generated and isinstance(out.generated.obj, dict) else None),
         "columns": columns,
         "rows": rows,
         "row_count": len(rows),
         "result_csv": out.result_csv,
         "explanation_text": out.explanation_text,
+        "explanation_judgement": out.explanation_judgement,
+        "explanation_issues": out.explanation_issues,
     }

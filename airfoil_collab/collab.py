@@ -25,6 +25,8 @@ class RunOutcome:
     executed_sql: str | None
     result_csv: str | None
     explanation_text: str | None
+    explanation_judgement: str | None
+    explanation_issues: list[str] | None
 
 
 def _now_iso() -> str:
@@ -363,6 +365,8 @@ def run_once(
             executed_sql=None,
             result_csv=None,
             explanation_text=None,
+            explanation_judgement=None,
+            explanation_issues=None,
         )
 
     model_sql = str(generated.obj.get("sql") or "")
@@ -398,6 +402,8 @@ def run_once(
             executed_sql=None,
             result_csv=None,
             explanation_text=None,
+            explanation_judgement=None,
+            explanation_issues=None,
         )
 
     exec_sql = audit.sql_to_execute
@@ -437,6 +443,8 @@ def run_once(
             executed_sql=exec_sql,
             result_csv=None,
             explanation_text=None,
+            explanation_judgement=None,
+            explanation_issues=None,
         )
 
     result_root = result_dir or (cfg.project_root / "数据智能协同" / "runs")
@@ -447,6 +455,8 @@ def run_once(
     snapshot_path.write_text(csv_out, encoding="utf-8", errors="ignore")
 
     explanation_text: str | None = None
+    explanation_judgement: str | None = None
+    explanation_issues: list[str] | None = None
     if do_explain:
         try:
             explanation_text = explain_result(cfg, question=question, sql=exec_sql, csv_text=csv_out)
@@ -455,6 +465,8 @@ def run_once(
                 csv_text=csv_out,
                 question=question,
             )
+            explanation_judgement = exp_judgement
+            explanation_issues = exp_issues
             _insert_result_explain_audit(
                 cfg,
                 query_id=query_id,
@@ -474,4 +486,6 @@ def run_once(
         executed_sql=exec_sql,
         result_csv=csv_out,
         explanation_text=explanation_text,
+        explanation_judgement=explanation_judgement,
+        explanation_issues=explanation_issues,
     )

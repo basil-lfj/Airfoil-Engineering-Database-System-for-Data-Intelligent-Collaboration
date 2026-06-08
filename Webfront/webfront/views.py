@@ -1,7 +1,8 @@
 import logging
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_http_methods
 
 from .services import airfoil_service
 
@@ -116,3 +117,59 @@ def nl2sql_api(request):
     except Exception as e:
         logger.exception('NL2SQL API 异常')
         return JsonResponse({'error': f'服务内部错误: {str(e)[:200]}'}, status=500)
+
+
+def nl2sql_audit_list(request):
+    from .models import NL2SQLAudit
+
+    audits = NL2SQLAudit.objects.select_related("query").order_by("-created_at")[:200]
+    return render(request, "webfront/nl2sql_audit_list.html", {"audits": audits})
+
+
+@require_http_methods(["GET", "POST"])
+def nl2sql_audit_detail(request, audit_id):
+    from .models import NL2SQLAudit
+
+    audit = get_object_or_404(NL2SQLAudit.objects.select_related("query"), audit_id=audit_id)
+
+    if request.method == "POST":
+        audit_status = (request.POST.get("audit_status") or "").strip()
+        audited_sql = (request.POST.get("audited_sql") or "").strip()
+        error_types_json = (request.POST.get("error_types_json") or "").strip()
+        notes = (request.POST.get("notes") or "").strip()
+
+        NL2SQLAudit.objects.filter(audit_id=audit.audit_id).update(
+            audit_status=audit_status or audit.audit_status,
+            audited_sql=audited_sql or None,
+            error_types_json=error_types_json or None,
+            notes=notes or None,
+        )
+        return redirect("webfront:nl2sql_audit_detail", audit_id=audit.audit_id)
+
+    return render(request, "webfront/nl2sql_audit_detail.html", {"audit": audit})
+
+
+def explain_audit_list(request):
+    from .models import ResultExplainAudit
+
+    audits = ResultExplainAudit.objects.select_related("query").order_by("-created_at")[:200]
+    return render(request, "webfront/explain_audit_list.html", {"audits": audits})
+
+
+@require_http_methods(["GET", "POST"])
+def explain_audit_detail(request, explain_id):
+    from .models import ResultExplainAudit
+
+    audit = get_object_or_404(ResultExplainAudit.objects.select_related("query"), explain_id=explain_id)
+
+    if request.method == "POST":
+        judgement = (request.POST.get("judgement") or "").strip()
+        issues_json = (request.POST.get("issues_json") or "").strip()
+
+        ResultExplainAudit.objects.filter(explain_id=audit.explain_id).update(
+            judgement=judgement or audit.judgement,
+            issues_json=issues_json or None,
+        )
+        return redirect("webfront:explain_audit_detail", explain_id=audit.explain_id)
+
+    return render(request, "webfront/explain_audit_detail.html", {"audit": audit})

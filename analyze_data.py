@@ -4,7 +4,7 @@ print("=" * 60)
 print("NACA 翼型数据全面分析报告")
 print("=" * 60)
 
-base = r"c:\Users\ASUS\Desktop\Databaselab\Bigwork\AEDS\source-data\NACAdata"
+base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "source-data", "NACAdata")
 foils_dir = os.path.join(base, "foils")
 polar_dir = os.path.join(base, "polar")
 

@@ -1,0 +1,85 @@
+{% extends 'webfront/base.html' %}
+{% block title %}NL2SQL 审计详情 · 翼型工程数据库{% endblock %}
+{% block content %}
+
+<div class="page-title">
+    <h1>NL2SQL 审计详情</h1>
+    <p>对单条记录进行复核与修订（只更新审计表，不自动重跑 SQL）</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>基本信息</h2>
+        <a class="btn btn-sm" href="{% url 'webfront:nl2sql_audit_list' %}">返回列表</a>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="result-grid">
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">Audit ID</div>
+            <div class="link-mono">{{ audit.audit_id }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">Query ID</div>
+            <div class="link-mono">{{ audit.query_id }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">创建时间</div>
+            <div class="link-mono">{{ audit.created_at|date:"Y-m-d H:i:s" }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">审计状态</div>
+            <div class="link-mono">{{ audit.audit_status }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>复核与修订</h2>
+        <span class="count">保存后可用于报告统计/追溯</span>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="result-grid">
+            <div>
+                <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">audit_status</div>
+                <select name="audit_status" class="btn" style="width:100%;justify-content:flex-start;">
+                    <option value="approved" {% if audit.audit_status == "approved" %}selected{% endif %}>approved</option>
+                    <option value="needs_fix" {% if audit.audit_status == "needs_fix" %}selected{% endif %}>needs_fix</option>
+                    <option value="rejected" {% if audit.audit_status == "rejected" %}selected{% endif %}>rejected</option>
+                </select>
+            </div>
+            <div>
+                <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">error_types_json</div>
+                <input name="error_types_json" value="{{ audit.error_types_json|default:'' }}" class="btn" style="width:100%;justify-content:flex-start;">
+            </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">自然语言问题</div>
+            <div style="background:var(--gray-light);padding:0.9rem;border-radius:var(--radius);">{{ audit.nl_question }}</div>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">generated_sql</div>
+            <textarea readonly style="width:100%;min-height:110px;padding:0.9rem;border-radius:var(--radius);border:1px solid var(--border);font-family:var(--font-mono);font-size:0.78rem;">{{ audit.generated_sql }}</textarea>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">audited_sql（可选）</div>
+            <textarea name="audited_sql" style="width:100%;min-height:110px;padding:0.9rem;border-radius:var(--radius);border:1px solid var(--border);font-family:var(--font-mono);font-size:0.78rem;">{{ audit.audited_sql|default:'' }}</textarea>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">notes（可选）</div>
+            <textarea name="notes" style="width:100%;min-height:90px;padding:0.9rem;border-radius:var(--radius);border:1px solid var(--border);font-size:0.85rem;">{{ audit.notes|default:'' }}</textarea>
+        </div>
+
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            <button class="btn btn-primary" type="submit">保存复核</button>
+            <a class="btn" href="{% url 'webfront:nl2sql_audit_detail' audit.audit_id %}">刷新</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,75 @@
+{% extends 'webfront/base.html' %}
+{% block title %}结果解释审计详情 · 翼型工程数据库{% endblock %}
+{% block content %}
+
+<div class="page-title">
+    <h1>结果解释审计详情</h1>
+    <p>对单条解释记录进行复核与修订（用于“是否基于结果/是否幻觉”等评估）</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>基本信息</h2>
+        <a class="btn btn-sm" href="{% url 'webfront:explain_audit_list' %}">返回列表</a>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="result-grid">
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">Explain ID</div>
+            <div class="link-mono">{{ audit.explain_id }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">Query ID</div>
+            <div class="link-mono">{{ audit.query_id }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">创建时间</div>
+            <div class="link-mono">{{ audit.created_at|date:"Y-m-d H:i:s" }}</div>
+        </div>
+        <div>
+            <div style="color:var(--ink-secondary);font-size:0.8rem;">judgement</div>
+            <div class="link-mono">{{ audit.judgement }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2>复核与修订</h2>
+        <span class="count">保存后可用于报告统计/追溯</span>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="result-grid">
+            <div>
+                <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">judgement</div>
+                <select name="judgement" class="btn" style="width:100%;justify-content:flex-start;">
+                    <option value="correct" {% if audit.judgement == "correct" %}selected{% endif %}>correct</option>
+                    <option value="incorrect" {% if audit.judgement == "incorrect" %}selected{% endif %}>incorrect</option>
+                    <option value="unsupported" {% if audit.judgement == "unsupported" %}selected{% endif %}>unsupported</option>
+                </select>
+            </div>
+            <div>
+                <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">issues_json</div>
+                <input name="issues_json" value="{{ audit.issues_json|default:'' }}" class="btn" style="width:100%;justify-content:flex-start;">
+            </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">result_snapshot_ref</div>
+            <div class="link-mono" style="background:var(--gray-light);padding:0.7rem;border-radius:var(--radius);overflow-x:auto;">{{ audit.result_snapshot_ref }}</div>
+        </div>
+
+        <div style="margin-top:1rem;">
+            <div style="color:var(--ink-secondary);font-size:0.8rem;margin-bottom:0.35rem;">llm_explanation</div>
+            <div style="background:var(--gray-light);padding:0.9rem;border-radius:var(--radius);white-space:pre-wrap;">{{ audit.llm_explanation }}</div>
+        </div>
+
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            <button class="btn btn-primary" type="submit">保存复核</button>
+            <a class="btn" href="{% url 'webfront:explain_audit_detail' audit.explain_id %}">刷新</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+

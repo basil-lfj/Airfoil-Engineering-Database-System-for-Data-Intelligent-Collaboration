@@ -23,9 +23,9 @@ plt.rcParams["font.size"] = 11
 plt.rcParams["axes.unicode_minus"] = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FOILS_DIR = os.path.join(BASE_DIR, "AEDS", "source-data", "NACAdata", "foils")
-POLAR_DIR = os.path.join(BASE_DIR, "AEDS", "source-data", "NACAdata", "polar")
-OUTPUT_DIR = os.path.join(BASE_DIR, "visualization")
+FOILS_DIR = os.path.join(BASE_DIR, "source-data", "NACAdata", "foils")
+POLAR_DIR = os.path.join(BASE_DIR, "source-data", "NACAdata", "polar")
+OUTPUT_DIR = os.path.join(BASE_DIR, "Webfront", "static", "visualization")
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 

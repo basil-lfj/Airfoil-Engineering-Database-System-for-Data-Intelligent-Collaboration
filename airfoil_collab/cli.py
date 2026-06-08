@@ -8,6 +8,7 @@ from pathlib import Path
 from .collab import bootstrap_db, run_once
 from .config import load_app_config
 from .eval import run_eval, run_explain_eval
+from .psql import run_psql
 
 
 def _cmd_bootstrap(args: argparse.Namespace) -> int:
@@ -72,6 +73,70 @@ def _cmd_anomaly_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _sql_quote(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
+
+
+def _cmd_review_nl2sql(args: argparse.Namespace) -> int:
+    cfg = load_app_config()
+    sets: list[str] = []
+    if args.audit_status:
+        sets.append("audit_status=" + _sql_quote(args.audit_status))
+    if args.audited_sql is not None:
+        sets.append("audited_sql=" + (_sql_quote(args.audited_sql) if args.audited_sql != "" else "NULL"))
+    if args.error_types_json is not None:
+        sets.append(
+            "error_types_json=" + (_sql_quote(args.error_types_json) if args.error_types_json != "" else "NULL")
+        )
+    if args.notes is not None:
+        sets.append("notes=" + (_sql_quote(args.notes) if args.notes != "" else "NULL"))
+    if not sets:
+        return 0
+
+    where = ""
+    if args.audit_id:
+        where = "audit_id=" + _sql_quote(str(args.audit_id))
+    elif args.query_id:
+        where = "query_id=" + _sql_quote(str(args.query_id))
+    else:
+        return 2
+
+    sql = "UPDATE public.nl2sql_audit SET " + ", ".join(sets) + " WHERE " + where + " RETURNING audit_id::text;"
+    res = run_psql(cfg.postgres, sql, tuples_only=True, no_align=True, quiet=True)
+    sys.stdout.write(json.dumps({"updated_audit_id": res.stdout.strip()}, ensure_ascii=False) + "\n")
+    return 0
+
+
+def _cmd_review_explain(args: argparse.Namespace) -> int:
+    cfg = load_app_config()
+    sets: list[str] = []
+    if args.judgement:
+        sets.append("judgement=" + _sql_quote(args.judgement))
+    if args.issues_json is not None:
+        sets.append("issues_json=" + (_sql_quote(args.issues_json) if args.issues_json != "" else "NULL"))
+    if not sets:
+        return 0
+
+    where = ""
+    if args.explain_id:
+        where = "explain_id=" + _sql_quote(str(args.explain_id))
+    elif args.query_id:
+        where = "query_id=" + _sql_quote(str(args.query_id))
+    else:
+        return 2
+
+    sql = (
+        "UPDATE public.result_explain_audit SET "
+        + ", ".join(sets)
+        + " WHERE "
+        + where
+        + " RETURNING explain_id::text;"
+    )
+    res = run_psql(cfg.postgres, sql, tuples_only=True, no_align=True, quiet=True)
+    sys.stdout.write(json.dumps({"updated_explain_id": res.stdout.strip()}, ensure_ascii=False) + "\n")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="airfoil-collab", add_help=True)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -109,6 +174,22 @@ def build_parser() -> argparse.ArgumentParser:
     p_anomaly = sub.add_parser("anomaly-compare", help="rule vs llm anomaly detection comparison")
     p_anomaly.add_argument("--sample-size", type=int, default=100, help="number of records to sample")
     p_anomaly.set_defaults(func=_cmd_anomaly_compare)
+
+    p_review = sub.add_parser("review-nl2sql", help="manual review/update for nl2sql_audit")
+    p_review.add_argument("--audit-id", default="", help="audit_id uuid")
+    p_review.add_argument("--query-id", default="", help="query_id uuid")
+    p_review.add_argument("--audit-status", default="", choices=["approved", "needs_fix", "rejected"], help="audit_status")
+    p_review.add_argument("--audited-sql", default=None, help="audited_sql; use empty string to clear")
+    p_review.add_argument("--error-types-json", default=None, help="error_types_json; use empty string to clear")
+    p_review.add_argument("--notes", default=None, help="notes; use empty string to clear")
+    p_review.set_defaults(func=_cmd_review_nl2sql)
+
+    p_review_exp = sub.add_parser("review-explain", help="manual review/update for result_explain_audit")
+    p_review_exp.add_argument("--explain-id", default="", help="explain_id uuid")
+    p_review_exp.add_argument("--query-id", default="", help="query_id uuid")
+    p_review_exp.add_argument("--judgement", default="", choices=["correct", "incorrect", "unsupported"], help="judgement")
+    p_review_exp.add_argument("--issues-json", default=None, help="issues_json; use empty string to clear")
+    p_review_exp.set_defaults(func=_cmd_review_explain)
 
     return p
 
