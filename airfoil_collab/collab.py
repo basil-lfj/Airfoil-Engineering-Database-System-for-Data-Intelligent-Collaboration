@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import uuid
 from dataclasses import dataclass
@@ -12,6 +13,8 @@ from .config import AppConfig
 from .deepseek import DeepSeekError, JsonCallResult, call_json_with_retries
 from .psql import PsqlError, export_select_to_csv, run_psql, run_psql_file
 from .schema_prompt import SchemaSnapshot, build_schema_prompt
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -318,6 +321,7 @@ def run_once(
     generated: JsonCallResult | None = None
     try:
         generated = generate_sql(cfg, question=question, schema=schema)
+        logger.info("LLM generated object: %s", generated.obj) # 添加日志
         model_sql = str(generated.obj.get("sql") or "")
         query_type = _classify_query_type(model_sql)
         query_id = _insert_query_log(
@@ -363,6 +367,7 @@ def run_once(
 
     model_sql = str(generated.obj.get("sql") or "")
     audit = audit_sql(model_sql, question=question)
+    logger.info("审计结果: status=%s, errors=%s, sql_to_execute=%s", audit.audit_status, audit.error_types, audit.sql_to_execute)
     _insert_nl2sql_audit(
         cfg,
         query_id=query_id,
@@ -412,6 +417,7 @@ def run_once(
             quiet=True,
         )
     except PsqlError as e:
+        logger.error("SQL 执行失败: %s\nSQL: %s", e, exec_sql)
         run_psql(
             cfg.postgres,
             "UPDATE public.query_log SET is_success=false, error_message="

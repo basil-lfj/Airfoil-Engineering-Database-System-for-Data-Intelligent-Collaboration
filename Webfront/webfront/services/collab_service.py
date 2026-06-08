@@ -72,6 +72,7 @@ def nl2sql_query(
         "audit_status": out.audit.audit_status,
         "error_types": out.audit.error_types,
         "notes": out.audit.notes,
+        "executed_sql": out.executed_sql,
         "generated_sql": out.executed_sql,
         "columns": columns,
         "rows": rows,

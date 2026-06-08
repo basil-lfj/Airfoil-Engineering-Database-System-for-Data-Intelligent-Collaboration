@@ -158,6 +158,8 @@ def export_select_to_csv(
     s = select_sql.strip()
     if s.endswith(";"):
         s = s[:-1].rstrip()
+    # \copy 元命令不支持 SQL 中含有换行，替换为空格
+    s = s.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
 
     script = "\n".join(
         [

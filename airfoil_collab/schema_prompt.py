@@ -32,6 +32,22 @@ def build_schema_prompt(pg: PostgresConfig, *, mode: str) -> SchemaSnapshot:
                 "- api.list_airfoils_with_anomalies(p_only_current)",
                 "基础表（只读）：airfoil, airfoil_version, coordinate_point, experiment_condition, performance_record, anomaly_rule, anomaly_record",
                 "审计留痕表（只读/写入由应用层完成）：query_log, nl2sql_audit, result_explain_audit",
+                "",
+                "【数据约束提示】",
+                "- 翼型编码（airfoil_code）格式为 NACA_xxxx（注意带下划线），如 NACA_2412、NACA_0012、NACA_23012__12%",
+                "- experiment_condition 表中可用的雷诺数（reynolds_number）仅为：50000、100000、300000、500000、1000000",
+                "- 攻角（alpha_deg）范围：-90° ~ +90°",
+                "- 查询雷诺数条件时应使用上述可用值，否则结果为空",
+                "- 基础表字段：airfoil(airfoil_code, name), performance_record(cl, cd, l_over_d), coordinate_point(x, y, surface)",
+                "",
+                "【可用示例提问】",
+                '- "查询 NACA_2412 的当前有效版本"',
+                '- "在 Re=300000、攻角 α=2 条件下，列出升阻比最高的前 10 个翼型"',
+                '- "查询 NACA_0012 的上表面坐标点"',
+                '- "列出存在异常提示的翼型"',
+                '- "统计每个版本类型下的翼型数量"',
+                '- "查询翼型 NACA_0012 在 Re=500000 下不同攻角的 Cl、Cd 性能数据"',
+                '- "对比翼型 NACA_0012 和 NACA_2412 在 Re=300000 下的升阻比"',
             ]
         )
         meta_json = json.dumps({"mode": "weak"}, ensure_ascii=False)
@@ -79,7 +95,21 @@ WHERE n.nspname IN ('api')
         "数据库 Schema（强提示，JSON 结构化）：\n"
         + meta_json
         + "\n"
-        + "约束要求：涉及当前有效版本的查询必须使用 api.v_current_airfoil_version 选取 version_id，禁止自行推断当前版本。"
+        + "约束要求：\n"
+        + "1. 涉及当前有效版本的查询必须使用 api.v_current_airfoil_version 选取 version_id，禁止自行推断当前版本。\n"
+        + "2. 翼型编码（airfoil_code）格式为 NACA_xxxx（带下划线），如 NACA_2412、NACA_0012\n"
+        + "3. experiment_condition 表中可用的雷诺数（reynolds_number）仅为：50000、100000、300000、500000、1000000\n"
+        + "4. 查询雷诺数条件时应使用上述可用值，否则结果为空\n"
+        + "5. 敏感表 user_account 仅在问题明确要求创建者/用户名或查询日志统计时允许，且必须有过滤条件与 LIMIT\n"
+        + "\n"
+        + "【可用示例提问】\n"
+        + '- "查询 NACA_2412 的当前有效版本"\n'
+        + '- "在 Re=300000、攻角 α=2 条件下，列出升阻比最高的前 10 个翼型"\n'
+        + '- "查询 NACA_0012 的上表面坐标点"\n'
+        + '- "列出存在异常提示的翼型"\n'
+        + '- "统计每个版本类型下的翼型数量"\n'
+        + '- "查询翼型 NACA_0012 在 Re=500000 下不同攻角的 Cl、Cd 性能数据"\n'
+        + '- "对比翼型 NACA_0012 和 NACA_2412 在 Re=300000 下的升阻比"'
     )
     return SchemaSnapshot(mode="strong", text=text, meta_json=meta_json)
 

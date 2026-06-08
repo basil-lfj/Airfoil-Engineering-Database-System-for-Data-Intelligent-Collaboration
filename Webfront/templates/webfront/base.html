@@ -274,6 +274,113 @@
             color: var(--ink-secondary);
             margin-top: 0.15rem;
         }
+
+        /* ── Step Progress ── */
+        .step-progress {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.35rem 0;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .step-item.active { opacity: 1; }
+        .step-item.done { opacity: 0.7; }
+        .step-item.failed { opacity: 1; }
+        .step-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--border);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .step-item.active .step-dot {
+            background: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-light);
+            animation: pulse-dot 1.2s ease-in-out infinite;
+        }
+        .step-item.done .step-dot { background: var(--green); }
+        .step-item.failed .step-dot { background: var(--red); }
+        .step-label {
+            flex: 1;
+            font-size: 0.82rem;
+            color: var(--ink-secondary);
+        }
+        .step-item.active .step-label { color: var(--ink); font-weight: 500; }
+        .step-item.failed .step-label { color: var(--red); font-weight: 500; }
+        .step-status {
+            font-size: 0.72rem;
+            color: var(--ink-tertiary);
+            font-family: var(--font-mono);
+            white-space: nowrap;
+        }
+        .step-item.active .step-status { color: var(--accent); }
+        .step-item.done .step-status { color: var(--green); }
+        .step-item.failed .step-status { color: var(--red); }
+        @keyframes pulse-dot {
+            0%, 100% { box-shadow: 0 0 0 3px var(--accent-light); }
+            50% { box-shadow: 0 0 0 6px rgba(217,119,6,0.2); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Empty State ── */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .empty-state-icon {
+            width: 56px; height: 56px;
+            margin-bottom: 1rem;
+            color: var(--ink-tertiary);
+        }
+        .empty-state-icon svg { width: 100%; height: 100%; }
+        .empty-state-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ink);
+            margin-bottom: 0.35rem;
+        }
+        .empty-state-desc {
+            font-size: 0.82rem;
+            color: var(--ink-tertiary);
+            max-width: 360px;
+            line-height: 1.5;
+            margin-bottom: 1.25rem;
+        }
+        .empty-state .btn { margin-top: 0; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            html { font-size: 14px; }
+            .container { padding: 1.25rem 1rem 3rem; }
+            .nav { padding: 0 0.75rem; gap: 0; overflow-x: auto; }
+            .nav-brand { margin-right: 1rem; font-size: 0.85rem; }
+            .nav a { padding: 0.3rem 0.55rem; font-size: 0.78rem; white-space: nowrap; }
+            .stat-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+            .page-title h1 { font-size: 1.1rem; }
+            .result-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 480px) {
+            html { font-size: 13px; }
+            .container { padding: 1rem 0.75rem 2.5rem; }
+            .stat { padding: 0.9rem 1rem; }
+            .nav a { padding: 0.25rem 0.4rem; font-size: 0.72rem; }
+        }
     </style>
 </head>
 <body>
