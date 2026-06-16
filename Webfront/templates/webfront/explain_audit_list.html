@@ -2,9 +2,9 @@
 {% block title %}结果解释审计记录 · 翼型工程数据库{% endblock %}
 {% block content %}
 
-<div class="page-title">
+<div class="page-header">
     <h1>结果解释审计记录</h1>
-    <p>最近 200 条“结果 → 解释”的留痕与复核入口</p>
+    <p>最近 200 条"结果 → 解释"的留痕与复核入口</p>
 </div>
 
 <div class="card">
@@ -12,7 +12,7 @@
         <h2>解释审计列表</h2>
         <span class="count">{{ audits|length }} 条</span>
     </div>
-    <div style="overflow-x:auto;">
+    <div class="table-wrap">
         <table>
             <thead>
                 <tr>
@@ -21,7 +21,7 @@
                     <th>Query ID</th>
                     <th>Issues</th>
                     <th>快照</th>
-                    <th></th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,13 +37,13 @@
                             <span class="tag tag-amber">{{ a.judgement }}</span>
                         {% endif %}
                     </td>
-                    <td class="link-mono">{{ a.query_id }}</td>
-                    <td class="link-mono" style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.issues_json }}</td>
-                    <td class="link-mono" style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.result_snapshot_ref }}</td>
+                    <td class="link-mono" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">{{ a.query_id }}</td>
+                    <td class="link-mono" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.issues_json }}</td>
+                    <td class="link-mono" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.result_snapshot_ref }}</td>
                     <td><a class="btn btn-sm" href="{% url 'webfront:explain_audit_detail' a.explain_id %}">查看/复核</a></td>
                 </tr>
             {% empty %}
-                <tr><td colspan="6" style="color:var(--ink-tertiary);">暂无记录</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--ink-tertiary);">暂无记录</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -51,4 +51,3 @@
 </div>
 
 {% endblock %}
-

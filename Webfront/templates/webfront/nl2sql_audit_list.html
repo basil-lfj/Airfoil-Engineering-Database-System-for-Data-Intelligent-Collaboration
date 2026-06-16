@@ -2,7 +2,7 @@
 {% block title %}NL2SQL 审计记录 · 翼型工程数据库{% endblock %}
 {% block content %}
 
-<div class="page-title">
+<div class="page-header">
     <h1>NL2SQL 审计记录</h1>
     <p>最近 200 条自然语言到 SQL 的生成与审计留痕</p>
 </div>
@@ -12,7 +12,7 @@
         <h2>审计列表</h2>
         <span class="count">{{ audits|length }} 条</span>
     </div>
-    <div style="overflow-x:auto;">
+    <div class="table-wrap">
         <table>
             <thead>
                 <tr>
@@ -21,7 +21,7 @@
                     <th>Query ID</th>
                     <th>问题</th>
                     <th>错误类型</th>
-                    <th></th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,13 +37,13 @@
                             <span class="tag tag-red">{{ a.audit_status }}</span>
                         {% endif %}
                     </td>
-                    <td class="link-mono">{{ a.query_id }}</td>
-                    <td style="max-width:520px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.nl_question }}</td>
-                    <td class="link-mono" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.error_types_json }}</td>
+                    <td class="link-mono" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">{{ a.query_id }}</td>
+                    <td style="max-width:400px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.nl_question }}</td>
+                    <td class="link-mono" style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.error_types_json }}</td>
                     <td><a class="btn btn-sm" href="{% url 'webfront:nl2sql_audit_detail' a.audit_id %}">查看/复核</a></td>
                 </tr>
             {% empty %}
-                <tr><td colspan="6" style="color:var(--ink-tertiary);">暂无记录</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--ink-tertiary);">暂无记录</td></tr>
             {% endfor %}
             </tbody>
         </table>
@@ -51,4 +51,3 @@
 </div>
 
 {% endblock %}
-

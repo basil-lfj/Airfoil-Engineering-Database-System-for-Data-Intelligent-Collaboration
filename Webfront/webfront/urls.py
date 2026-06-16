@@ -17,4 +17,12 @@ urlpatterns = [
     path('nl2sql/audits/<uuid:audit_id>/', views.nl2sql_audit_detail, name='nl2sql_audit_detail'),
     path('nl2sql/explain-audits/', views.explain_audit_list, name='explain_audit_list'),
     path('nl2sql/explain-audits/<uuid:explain_id>/', views.explain_audit_detail, name='explain_audit_detail'),
+    path('nl2sql/history/', views.nl2sql_history, name='nl2sql_history'),
+    # 可视化 JSON API
+    path('visualize/api/foil-profiles/', views.visualize_api_foil_profiles, name='visualize_api_foil_profiles'),
+    path('visualize/api/cl-alpha/', views.visualize_api_cl_alpha, name='visualize_api_cl_alpha'),
+    path('visualize/api/cd-ld/', views.visualize_api_cd_ld, name='visualize_api_cd_ld'),
+    path('visualize/api/multi-comparison/', views.visualize_api_multi_comparison, name='visualize_api_multi_comparison'),
+    path('visualize/api/anomaly-detection/', views.visualize_api_anomaly_detection, name='visualize_api_anomaly_detection'),
+    path('visualize/api/data-overview/', views.visualize_api_data_overview, name='visualize_api_data_overview'),
 ]

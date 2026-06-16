@@ -1,9 +1,14 @@
 {% extends 'webfront/base.html' %}
-{% block title %}未找到 - 翼型工程数据库系统{% endblock %}
+{% block title %}未找到 · 翼型工程数据库{% endblock %}
 {% block content %}
-<div class="card" style="text-align:center;padding:3rem;">
-    <h2 style="font-size:3rem;color:#999;">404</h2>
-    <p style="margin:1rem 0;color:#666;">翼型 <strong>{{ code }}</strong> 未找到</p>
+<div class="empty" style="padding:var(--space-16) var(--space-6);">
+    <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+    </div>
+    <div class="empty-title">404 — 未找到</div>
+    <div class="empty-desc">翼型 <strong>{{ code }}</strong> 不存在或已被删除</div>
     <a href="{% url 'webfront:airfoil_list' %}" class="btn btn-primary">返回翼型列表</a>
 </div>
 {% endblock %}

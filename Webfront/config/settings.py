@@ -87,9 +87,19 @@ DATABASES = {
         'PORT': '5432',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
+        'CONN_MAX_AGE': 300,  # 连接复用 5 分钟
         'OPTIONS': {
             'client_encoding': 'UTF8',
         },
+    }
+}
+
+# 缓存配置（使用本地内存缓存）
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'airfoil-dashboard-cache',
+        'TIMEOUT': 60,
     }
 }
 

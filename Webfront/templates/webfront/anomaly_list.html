@@ -1,38 +1,55 @@
 {% extends 'webfront/base.html' %}
-{% block title %}异常数据 - 翼型工程数据库系统{% endblock %}
+{% block title %}异常数据 · 翼型工程数据库{% endblock %}
 {% block content %}
+
+<div class="page-header">
+    <h1>异常数据</h1>
+    <p>异常规则检测到的可疑性能记录 · 数据治理结果</p>
+</div>
+
 <div class="card">
-    <h2>异常数据记录 ({{ anomalies|length }})</h2>
-    <div class="alert alert-info">数据库通过异常规则检测到的可疑性能记录，展示数据治理结果</div>
-    <table>
-        <thead>
-            <tr>
-                <th>翼型</th>
-                <th>规则</th>
-                <th>严重度</th>
-                <th>状态</th>
-                <th>详情</th>
-                <th>检测时间</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for a in anomalies %}
-            <tr>
-                <td><strong><a href="{% url 'webfront:airfoil_detail' a.airfoil_code %}">{{ a.airfoil_code }}</a></strong></td>
-                <td><span class="badge badge-red">{{ a.rule_code }}</span></td>
-                <td>
-                    {% if a.severity == 'high' %}<span class="badge badge-red">高{% elif a.severity == 'medium' %}<span class="badge badge-orange">中{% else %}<span class="badge badge-blue">低{% endif %}</span>
-                </td>
-                <td>
-                    {% if a.status == 'open' %}<span class="badge badge-red">待确认{% elif a.status == 'confirmed' %}<span class="badge badge-orange">已确认{% else %}<span class="badge badge-gray">已忽略{% endif %}</span>
-                </td>
-                <td style="max-width:300px;font-size:12px;word-break:break-all;">{{ a.details }}</td>
-                <td>{{ a.detected_at|date:"Y-m-d H:i" }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6">暂无异常数据</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="card-header">
+        <h2>异常记录</h2>
+        <div class="flex items-center gap-3">
+            <span class="count">{{ anomalies|length }} 条</span>
+            <button class="btn btn-sm" onclick="exportTableCSV('anomalyTable', 'anomalies.csv')">导出 CSV</button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table id="anomalyTable">
+            <thead>
+                <tr>
+                    <th>翼型</th>
+                    <th>规则</th>
+                    <th>严重度</th>
+                    <th>状态</th>
+                    <th>详情</th>
+                    <th>检测时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in anomalies %}
+                <tr>
+                    <td><a href="{% url 'webfront:airfoil_detail' a.airfoil_code %}" class="link link-mono">{{ a.airfoil_code }}</a></td>
+                    <td><span class="tag tag-red">{{ a.rule_code }}</span></td>
+                    <td>
+                        {% if a.severity == 'high' %}<span class="tag tag-red">高</span>
+                        {% elif a.severity == 'medium' %}<span class="tag tag-amber">中</span>
+                        {% else %}<span class="tag tag-blue">低</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if a.status == 'open' %}<span class="tag tag-red">待确认</span>
+                        {% elif a.status == 'confirmed' %}<span class="tag tag-amber">已确认</span>
+                        {% else %}<span class="tag tag-gray">已忽略</span>{% endif %}
+                    </td>
+                    <td style="max-width:280px;font-size:var(--text-xs);word-break:break-all;color:var(--text-secondary);">{{ a.details }}</td>
+                    <td class="text-mono text-sm">{{ a.detected_at|date:"Y-m-d H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6"><div class="empty"><div class="empty-title">暂无异常数据</div><div class="empty-desc">数据质量良好，未触发任何异常规则</div></div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

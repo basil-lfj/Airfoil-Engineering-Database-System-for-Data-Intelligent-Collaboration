@@ -45,18 +45,20 @@ def search_airfoils(request):
     query = request.GET.get('q', '')
     alpha = request.GET.get('alpha', '')
     reynolds = request.GET.get('reynolds', '')
+    mode = request.GET.get('mode', 'name')
     results = []
 
-    if query:
-        results = airfoil_service.search_airfoils_by_name(query)
-    elif alpha and reynolds:
+    if mode == 'condition' and alpha and reynolds:
         results = airfoil_service.search_airfoils_by_condition(alpha, reynolds)
+    elif query:
+        results = airfoil_service.search_airfoils_by_name(query)
 
     return render(request, 'webfront/search.html', {
         'query': query,
         'alpha': alpha,
         'reynolds': reynolds,
         'results': results,
+        'mode': mode,
     })
 
 
@@ -89,10 +91,17 @@ def visualize(request):
     top_performers = airfoil_service.get_top_performers()
     anomaly_stats = airfoil_service.get_anomaly_stats()
     stats = airfoil_service.get_statistics()
+
+    # 解析筛选参数（从对比页面跳转携带）
+    filter_codes = request.GET.get('codes', '')
+    filter_reynolds = request.GET.get('reynolds', '')
+
     return render(request, 'webfront/visualize.html', {
         **stats,
         'top_performers': top_performers,
         'anomaly_stats': anomaly_stats,
+        'filter_codes': filter_codes,
+        'filter_reynolds': filter_reynolds,
     })
 
 
@@ -173,3 +182,76 @@ def explain_audit_detail(request, explain_id):
         return redirect("webfront:explain_audit_detail", explain_id=audit.explain_id)
 
     return render(request, "webfront/explain_audit_detail.html", {"audit": audit})
+
+
+# ── 可视化 JSON API ──────────────────────────────────────────────────
+
+
+def visualize_api_foil_profiles(request):
+    """API: 翼型轮廓数据"""
+    from .services.dao.airfoil_dao import get_all_airfoils
+    airfoils = get_all_airfoils()
+    codes = [a['airfoil_code'] for a in airfoils[:10]]
+    return JsonResponse({'codes': codes})
+
+
+def visualize_api_cl_alpha(request):
+    """API: 升力系数 Cl — 攻角 α 关系"""
+    from .services.dao.airfoil_dao import compare_airfoils
+    codes_str = request.GET.get('codes', 'NACA_2412,NACA_4412,NACA_0006')
+    reynolds = request.GET.get('reynolds', '300000')
+    codes = [c.strip() for c in codes_str.split(',') if c.strip()]
+    data = compare_airfoils(codes, reynolds) if codes else []
+    return JsonResponse({'data': data, 'codes': codes, 'reynolds': reynolds})
+
+
+def visualize_api_cd_ld(request):
+    """API: 阻力与升阻比数据"""
+    from .services.dao.airfoil_dao import compare_airfoils
+    codes_str = request.GET.get('codes', 'NACA_2412,NACA_4412,NACA_0006')
+    reynolds = request.GET.get('reynolds', '300000')
+    codes = [c.strip() for c in codes_str.split(',') if c.strip()]
+    data = compare_airfoils(codes, reynolds) if codes else []
+    return JsonResponse({'data': data, 'codes': codes, 'reynolds': reynolds})
+
+
+def visualize_api_multi_comparison(request):
+    """API: 多翼型性能对比"""
+    from .services.dao.airfoil_dao import compare_airfoils
+    codes_str = request.GET.get('codes', 'NACA_2412,NACA_4412,NACA_0006,NACA_0012,NACA_4421')
+    reynolds = request.GET.get('reynolds', '300000')
+    codes = [c.strip() for c in codes_str.split(',') if c.strip()]
+    data = compare_airfoils(codes, reynolds) if codes else []
+    return JsonResponse({'data': data, 'codes': codes, 'reynolds': reynolds})
+
+
+def visualize_api_anomaly_detection(request):
+    """API: 异常数据检测"""
+    from .services.dao.anomaly_dao import get_anomaly_stats
+    stats = get_anomaly_stats()
+    return JsonResponse({'stats': stats})
+
+
+def visualize_api_data_overview(request):
+    """API: 数据规模总览"""
+    from .services.dao.statistics_dao import get_statistics
+    stats = get_statistics()
+    return JsonResponse(stats)
+
+
+# ── NL2SQL 历史查询 API ─────────────────────────────────────────────
+
+
+def nl2sql_history(request):
+    """返回最近 50 条 NL2SQL 查询历史"""
+    from .models import QueryLog
+    logs = QueryLog.objects.filter(query_type='nl2sql').order_by('-at')[:50]
+    history = []
+    for log in logs:
+        history.append({
+            'query_id': str(log.query_id),
+            'question': log.parameters_json[:100] if log.parameters_json else '',
+            'is_success': log.is_success,
+            'at': log.at.strftime('%Y-%m-%d %H:%M:%S') if log.at else '',
+        })
+    return JsonResponse({'history': history})

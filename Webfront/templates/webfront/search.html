@@ -1,71 +1,105 @@
 {% extends 'webfront/base.html' %}
-{% block title %}工况查询 - 翼型工程数据库系统{% endblock %}
+{% block title %}工况查询 · 翼型工程数据库{% endblock %}
 {% block content %}
+
+<div class="page-header">
+    <h1>工况查询</h1>
+    <p>按翼型名称或工况条件搜索数据库</p>
+</div>
+
 <div class="card">
-    <h2>按条件查询翼型</h2>
-    <div class="alert alert-info">支持两种查询方式：<strong>按翼型名称搜索</strong> 或 <strong>按工况条件筛选</strong></div>
-    <form method="get" style="margin-bottom:1rem;">
-        <div class="search-box">
-            <input type="text" name="q" placeholder="输入翼型编码或名称..." value="{{ query }}">
-            <button type="submit">搜索</button>
+    <div class="tabs">
+        <button class="tab active" data-tab="name">按名称搜索</button>
+        <button class="tab" data-tab="condition">按工况搜索</button>
+    </div>
+
+    <form method="get" id="tab-name" class="tab-content">
+        <div class="input-group">
+            <input type="text" name="q" class="input" placeholder="输入翼型编码或名称…" value="{{ query }}">
+            <input type="hidden" name="mode" value="name">
+            <button type="submit" class="btn btn-primary">搜索</button>
         </div>
     </form>
-    <form method="get">
-        <div class="search-box">
-            <input type="number" name="alpha" placeholder="攻角 (deg)" value="{{ alpha }}" step="1">
-            <input type="number" name="reynolds" placeholder="雷诺数 (如 100000)" value="{{ reynolds }}" step="1000">
-            <input type="hidden" name="q" value="">
-            <button type="submit">按工况查询</button>
+
+    <form method="get" id="tab-condition" class="tab-content" style="display:none;">
+        <div class="input-group">
+            <input type="number" step="1" name="alpha" class="input" placeholder="攻角 (deg)" value="{{ alpha }}" style="max-width:160px;">
+            <input type="number" step="1000" name="reynolds" class="input" placeholder="雷诺数" value="{{ reynolds }}" style="max-width:200px;">
+            <input type="hidden" name="mode" value="condition">
+            <button type="submit" class="btn btn-primary">查询</button>
         </div>
     </form>
 </div>
 
 {% if results %}
 <div class="card">
-    <h2>查询结果 ({{ results|length }})</h2>
-    {% if alpha and reynolds %}
-    <table>
-        <thead>
-            <tr>
-                <th>翼型编码</th><th>名称</th><th>版本号</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in results %}
-            <tr>
-                <td><strong>{{ r.airfoil_code }}</strong></td>
-                <td>{{ r.name }}</td>
-                <td>{{ r.version_no }}</td>
-                <td>{{ r.cl|floatformat:4 }}</td>
-                <td>{{ r.cd|floatformat:6 }}</td>
-                <td>{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}-{% endif %}</td>
-                <td><span class="badge badge-blue">{{ r.source_type }}</span></td>
-                <td>{% if r.is_anomaly %}<span class="badge badge-red">异常</span>{% else %}<span class="badge badge-gray">正常</span>{% endif %}</td>
-                <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-primary btn-sm">详情</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <table>
-        <thead>
-            <tr><th>翼型编码</th><th>名称</th><th>家族</th><th>类型</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-            {% for r in results %}
-            <tr>
-                <td><strong>{{ r.airfoil_code }}</strong></td>
-                <td>{{ r.name }}</td>
-                <td>{{ r.family|default:"-" }}</td>
-                <td>{% if r.is_generated %}<span class="badge badge-orange">生成</span>{% else %}<span class="badge badge-green">真实</span>{% endif %}</td>
-                <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-primary btn-sm">详情</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    <div class="card-header">
+        <h2>查询结果</h2>
+        <div class="flex items-center gap-3">
+            <span class="count">{{ results|length }} 条</span>
+            <button class="btn btn-sm" onclick="exportTableCSV('searchTable', 'search_results.csv')">导出 CSV</button>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table id="searchTable">
+            <thead>
+                <tr>
+                    {% if mode == 'condition' %}
+                    <th>翼型编码</th><th>名称</th><th>版本号</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th></th>
+                    {% else %}
+                    <th>翼型编码</th><th>名称</th><th>家族</th><th>类型</th><th></th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if mode == 'condition' %}
+                {% for r in results %}
+                <tr>
+                    <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="link link-mono">{{ r.airfoil_code }}</a></td>
+                    <td>{{ r.name }}</td>
+                    <td class="text-mono">{{ r.version_no }}</td>
+                    <td class="text-mono">{{ r.cl|floatformat:4 }}</td>
+                    <td class="text-mono">{{ r.cd|floatformat:6 }}</td>
+                    <td class="text-mono">{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}—{% endif %}</td>
+                    <td><span class="tag {% if r.source_type == 'real' %}tag-green{% else %}tag-blue{% endif %}">{{ r.source_type }}</span></td>
+                    <td>{% if r.is_anomaly %}<span class="tag tag-red">异常</span>{% endif %}</td>
+                    <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-sm btn-ghost">详情</a></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                {% for r in results %}
+                <tr>
+                    <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="link link-mono">{{ r.airfoil_code }}</a></td>
+                    <td>{{ r.name }}</td>
+                    <td><span class="text-secondary">{{ r.family|default:"—" }}</span></td>
+                    <td>{% if r.is_generated %}<span class="tag tag-amber">生成</span>{% else %}<span class="tag tag-green">真实</span>{% endif %}</td>
+                    <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="btn btn-sm btn-ghost">详情</a></td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% elif query or alpha %}
-<div class="alert alert-warn">未找到匹配结果</div>
+<div class="alert alert-warn">未找到匹配结果，请调整搜索条件后重试</div>
 {% endif %}
+
+<script>
+document.querySelectorAll('.tab').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(function(c){ c.style.display = 'none'; });
+        document.getElementById('tab-' + this.dataset.tab).style.display = '';
+    });
+});
+(function(){
+    var mode = '{{ mode|default:"name" }}';
+    if (mode === 'condition') {
+        var btn = document.querySelector('[data-tab="condition"]');
+        if (btn) btn.click();
+    }
+})();
+</script>
 {% endblock %}
