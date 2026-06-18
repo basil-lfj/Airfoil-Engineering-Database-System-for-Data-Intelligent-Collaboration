@@ -79,6 +79,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script>
+var TOOLBOX = {
+    feature: { saveAsImage: { pixelRatio: 2, title: '导出 PNG' } },
+    right: 10, top: 5, iconStyle: { borderColor: '#94a3b8' }
+};
+var DATAZOOM_LINE = [{ type: 'inside', xAxisIndex: 0 }, { type: 'slider', xAxisIndex: 0, height: 14, bottom: 6, borderColor: '#e2e6ec' }];
+
 (function(){
     var params = new URLSearchParams(window.location.search);
     var codes = params.get('codes');
@@ -101,13 +107,15 @@ function getFilterParams() {
     var data = {{ top_performers|safe }};
     chart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { left: 120, right: 30, top: 20, bottom: 30 },
+        toolbox: TOOLBOX,
+        grid: { left: 120, right: 40, top: 40, bottom: 30 },
         xAxis: { type: 'value', name: '平均升阻比' },
         yAxis: {
             type: 'category',
             data: data.map(function(d){ return d.airfoil_code; }).reverse(),
             axisLabel: { fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }
         },
+        dataZoom: [{ type: 'slider', yAxisIndex: 0, height: 12, bottom: 0, borderColor: '#e2e6ec' }],
         series: [{
             type: 'bar',
             data: data.map(function(d){ return parseFloat(d.avg_ld || 0); }).reverse(),
@@ -135,6 +143,8 @@ function loadChart(url, chartId, transformFn) {
 loadChart('{% url "webfront:visualize_api_foil_profiles" %}', 'chart-foil-profiles', function(data){
     return {
         tooltip: { trigger: 'axis' },
+        toolbox: TOOLBOX,
+        grid: { left: 55, right: 40, top: 40, bottom: 30 },
         xAxis: { type: 'category', data: data.codes, axisLabel: { rotate: 45, fontSize: 10 } },
         yAxis: { type: 'value', name: '序号' },
         series: [{
@@ -165,10 +175,12 @@ function loadClAlpha() {
             });
             chart.setOption({
                 tooltip: { trigger: 'axis' },
+                toolbox: TOOLBOX,
                 legend: { data: codes, bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
-                grid: { left: 55, right: 20, top: 20, bottom: 40 },
+                grid: { left: 55, right: 40, top: 40, bottom: 60 },
                 xAxis: { type: 'value', name: '攻角 α (°)' },
                 yAxis: { type: 'value', name: '升力系数 Cl' },
+                dataZoom: DATAZOOM_LINE,
                 series: series
             });
         });
@@ -195,10 +207,12 @@ function loadCdLd() {
             });
             chart.setOption({
                 tooltip: { trigger: 'axis' },
+                toolbox: TOOLBOX,
                 legend: { data: codes, bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
-                grid: { left: 55, right: 20, top: 20, bottom: 40 },
+                grid: { left: 55, right: 40, top: 40, bottom: 60 },
                 xAxis: { type: 'value', name: '攻角 α (°)' },
                 yAxis: { type: 'value', name: '升阻比 L/D' },
+                dataZoom: DATAZOOM_LINE,
                 series: series
             });
         });
@@ -225,10 +239,12 @@ function loadMultiComparison() {
             });
             chart.setOption({
                 tooltip: { trigger: 'axis' },
+                toolbox: TOOLBOX,
                 legend: { data: codes, bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
-                grid: { left: 55, right: 20, top: 20, bottom: 40 },
+                grid: { left: 55, right: 40, top: 40, bottom: 60 },
                 xAxis: { type: 'value', name: '攻角 α (°)' },
                 yAxis: { type: 'value', name: '升力系数 Cl' },
+                dataZoom: DATAZOOM_LINE,
                 series: series
             });
         });
@@ -239,6 +255,7 @@ loadChart('{% url "webfront:visualize_api_anomaly_detection" %}', 'chart-anomaly
     var stats = data.stats || [];
     return {
         tooltip: { trigger: 'item' },
+        toolbox: TOOLBOX,
         series: [{
             type: 'pie', radius: ['40%','70%'],
             data: stats.map(function(d){ return { name: d.rule_code, value: parseInt(d.cnt) }; }),
@@ -259,6 +276,7 @@ loadChart('{% url "webfront:visualize_api_data_overview" %}', 'chart-data-overvi
     ];
     return {
         tooltip: { trigger: 'item' },
+        toolbox: TOOLBOX,
         series: [{
             type: 'pie', radius: ['30%','60%'],
             data: items,

@@ -90,7 +90,7 @@
         <a id="auditDetailLink" class="btn btn-sm" target="_blank" style="display:none;">查看审计详情 →</a>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" class="result-grid">
+    <div class="result-grid">
         <!-- 生成的 SQL -->
         <div class="card" style="margin-bottom:0;">
             <div class="card-header">
@@ -115,7 +115,10 @@
     <div class="card" style="margin-top:1rem;">
         <div class="card-header">
             <h2>查询结果</h2>
-            <span id="rowCount" class="count"></span>
+            <div class="flex items-center gap-3">
+                <span id="rowCount" class="count"></span>
+                <button class="btn btn-sm" onclick="exportNL2SQLCSV()">导出 CSV</button>
+            </div>
         </div>
         <div id="tableWrapper" style="overflow-x:auto;">
             <table id="resultTable">
@@ -438,6 +441,27 @@ function fillHistory(question) {
     document.getElementById('questionInput').value = question;
     document.getElementById('historyList').style.display = 'none';
     submitQuery();
+}
+
+/* ── CSV 导出 ── */
+function exportNL2SQLCSV() {
+    var thead = document.getElementById('tableHead');
+    var tbody = document.getElementById('tableBody');
+    if (!thead || !tbody) return;
+    var headers = thead.querySelectorAll('th');
+    if (headers.length === 0) return;
+    var csv = '\uFEFF';
+    csv += Array.from(headers).map(function(h){ return '"' + h.textContent.trim() + '"'; }).join(',') + '\n';
+    Array.from(tbody.querySelectorAll('tr')).forEach(function(tr){
+        csv += Array.from(tr.querySelectorAll('td')).map(function(td){
+            return '"' + td.textContent.trim().replace(/"/g, '""') + '"';
+        }).join(',') + '\n';
+    });
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'nl2sql_results.csv';
+    link.click();
 }
 </script>
 

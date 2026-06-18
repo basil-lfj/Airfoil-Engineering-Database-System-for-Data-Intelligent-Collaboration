@@ -152,7 +152,7 @@ def export_select_to_csv(
     pg: PostgresConfig,
     select_sql: str,
     *,
-    statement_timeout_ms: int = 3000,
+    statement_timeout_ms: int = int(os.environ.get('STATEMENT_TIMEOUT_MS', '3000')),
     timeout_s: float | None = None,
 ) -> str:
     s = select_sql.strip()

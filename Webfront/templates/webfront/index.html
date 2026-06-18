@@ -108,13 +108,20 @@
     var data = {{ top_performers|safe }};
     chart.setOption({
         tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-        grid: { left: 120, right: 30, top: 15, bottom: 30 },
+        toolbox: {
+            feature: {
+                saveAsImage: { pixelRatio: 2, title: '导出 PNG' }
+            },
+            right: 10, top: 5
+        },
+        grid: { left: 120, right: 40, top: 40, bottom: 30 },
         xAxis: { type: 'value', name: '平均升阻比', nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
         yAxis: {
             type: 'category',
             data: data.map(function(d){ return d.airfoil_code; }).reverse(),
             axisLabel: { fontSize: 10, fontFamily: "'JetBrains Mono',monospace" }
         },
+        dataZoom: [{ type: 'slider', yAxisIndex: 0, height: 12, bottom: 0, borderColor: '#e2e6ec' }],
         series: [{
             type: 'bar',
             data: data.map(function(d){ return parseFloat(d.avg_ld || 0); }).reverse(),
@@ -133,6 +140,12 @@
     var data = {{ anomaly_stats|safe }};
     chart.setOption({
         tooltip: { trigger: 'item' },
+        toolbox: {
+            feature: {
+                saveAsImage: { pixelRatio: 2, title: '导出 PNG' }
+            },
+            right: 10, top: 5
+        },
         series: [{
             type: 'pie',
             radius: ['40%','70%'],
