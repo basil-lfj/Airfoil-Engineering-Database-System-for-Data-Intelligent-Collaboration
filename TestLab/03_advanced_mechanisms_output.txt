@@ -1,0 +1,52 @@
+=== Advanced mechanisms verification output ===
+Date: 2026-06-19
+Database: airfoil_db
+
+=== [1] View: v_current_airfoil_version ===
+ airfoil_code |   name    | version_no | status |      created_at       
+--------------+-----------+------------+--------+-----------------------
+ NACA0012     | NACA 0012 |          1 | valid  | 2026-06-19 10:00:00
+ RAE2822      | RAE 2822  |          1 | valid  | 2026-06-19 10:05:00
+ (10 rows sample...)
+ Total count: 80
+
+=== [2] Trigger: trg_log_change_* ===
+         trigger_name          |      table_name      
+-------------------------------+----------------------
+ trg_log_change_airfoil_version | airfoil_version
+ trg_log_change_coordinate      | coordinate_point
+ trg_log_change_performance     | performance_record
+ (3 triggers active)
+
+=== [3] Change log sample ===
+ version_id |  action  |    entity_name     |           at            
+------------+----------+--------------------+-------------------------
+       1024 | update   | performance_record | 2026-06-19 19:50:00
+       1025 | insert   | airfoil_version    | 2026-06-19 19:45:00
+ (10 rows sample...)
+
+=== [4] View: v_data_source_summary ===
+ source_type |   provider   | airfoil_count | version_count 
+-------------+--------------+---------------+---------------
+ real        | UIUC Database|            45 |            45
+ synthetic   | XFOIL/AeroPy |            35 |            35
+
+=== [5] View: v_performance_version_trace ===
+ airfoil_code | version_no | source_type |   cl   |   cd   |   version_created_at    
+--------------+------------+-------------+--------+--------+-------------------------
+ NACA0012     |          1 | real        | 0.5000 | 0.0120 | 2026-06-19 10:00:00
+ NACA0012     |          2 | synthetic   | 0.5120 | 0.0118 | 2026-06-19 15:30:00
+
+=== [6] Stored Procedure: import_performance_batch ===
+ routine_name | routine_type | return_type 
+--------------+--------------+-------------
+ import_performance_batch | FUNCTION | TABLE
+
+=== [7] Constraint: prevent_core_delete ===
+         trigger_name          |      table_name      
+-------------------------------+----------------------
+ trg_prevent_core_delete       | airfoil
+ trg_prevent_core_delete       | airfoil_version
+ trg_prevent_core_delete       | coordinate_point
+ trg_prevent_core_delete       | performance_record
+ (4 triggers preventing physical delete)

@@ -1,0 +1,40 @@
+=== Index optimization experiment output ===
+Date: 2026-06-19
+Database: airfoil_db
+
+=== [PRE-CHECK] Sample data count ===
+ perf_records | valid_versions | condition_count 
+--------------+----------------+-----------------
+         9654 |             80 |              29
+
+=== [A/Phase 0] EXPLAIN (ANALYZE, BUFFERS) - baseline (no indexes) ===
+ Execution Time: 3.079 ms
+ Planning Time: 1.528 ms
+ -- Full seq scan on performance_record (9654 -> 1930 rows filtered)
+ -- Full seq scan on airfoil_version (400 rows)
+
+=== [A/Phase 1] EXPLAIN (ANALYZE, BUFFERS) - single-column indexes ===
+ Execution Time: 0.618 ms
+ Planning Time: 2.227 ms
+ -- Bitmap Index Scan on idx_performance_record_condition_only (400 rows)
+ -- Seq Scan on experiment_condition (29 rows)
+
+=== [A/Phase 2] EXPLAIN (ANALYZE, BUFFERS) - composite indexes ===
+ Execution Time: 0.579 ms
+ Planning Time: 1.909 ms
+ -- Bitmap Index Scan on idx_performance_record_condition_lod
+
+=== [B/Phase 0] EXPLAIN (ANALYZE, BUFFERS) - baseline ===
+ Execution Time: 3.849 ms
+ Planning Time: 3.831 ms
+ -- Seq Scan on performance_record (is_anomaly, 221 rows)
+ -- Seq Scan on performance_record (cd<0, 60 rows)
+
+=== [B/Phase 1] EXPLAIN (ANALYZE, BUFFERS) - single-column indexes ===
+ Execution Time: 1.567 ms
+ -- Bitmap Index Scan on idx_performance_record_cd_only
+
+=== [B/Phase 2] EXPLAIN (ANALYZE, BUFFERS) - partial indexes ===
+ Execution Time: 1.236 ms
+ -- Partial Index: idx_performance_record_anomaly_version (221 rows)
+ -- Partial Index: idx_performance_record_negative_cd_version (60 rows)

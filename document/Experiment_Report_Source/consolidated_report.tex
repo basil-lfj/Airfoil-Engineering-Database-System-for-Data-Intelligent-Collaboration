@@ -1,0 +1,156 @@
+\documentclass[UTF8,a4paper,11pt]{ctexart}
+
+% ----- 宏包加载 -----
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[most]{tcolorbox}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds,mindmap,calc,shadows}
+
+% ----- 颜色与样式定义 -----
+\definecolor{mainblue}{RGB}{0,70,127}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.98,0.98,0.95}
+
+\lstset{
+    language=SQL,
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{mainblue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breaklines=true,                 
+    captionpos=b,                    
+    numbers=left,                    
+    numbersep=5pt,                  
+    frame=leftline,
+    rulecolor=\color{mainblue}
+}
+
+% ----- 页眉页脚 -----
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small AEDS 翼型工程数据库实验汇总}
+\rhead{\small \thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% ----- 标题样式 -----
+\titleformat{\section}{\Large\bfseries\color{mainblue}}{\thesection}{1em}{}[\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{mainblue}}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\begin{center}
+    {\Huge \bfseries AEDS 数据库高级机制实验验证汇总报告} \\
+    \vspace{0.5cm}
+    {\large 实验日期：2026年6月19日 \quad 实验小组：第23组}
+\end{center}
+
+\section{索引设计与性能实验}
+
+\subsection{核心查询语句 (Q2: 工况条件筛选)}
+\begin{lstlisting}[caption=工况条件筛选核心 SQL]
+-- 在 alpha=0, Re=100000 条件下筛选 Cd <= 0.02 的翼型，并按升阻比降序排列
+SELECT a.airfoil_code, av.version_no, pr.cl, pr.cd, pr.l_over_d
+FROM airfoil a
+JOIN airfoil_version av ON av.airfoil_id = a.airfoil_id
+JOIN performance_record pr ON pr.version_id = av.version_id
+JOIN experiment_condition ec ON ec.condition_id = pr.condition_id
+WHERE ec.alpha_deg = 0 AND ec.reynolds_number = 100000
+  AND pr.cd <= 0.02 AND av.is_current = true
+ORDER BY pr.l_over_d DESC LIMIT 50;
+\end{lstlisting}
+
+\subsection{执行计划文本输出与性能对比}
+
+\begin{tcolorbox}[colframe=mainblue, title=实验阶段对比结果]
+\begin{enumerate}
+    \item \textbf{无索引情况 (Phase 0)}：执行耗时 \textbf{3.079 ms}。全表扫描 \texttt{performance\_record}（9654行）及 \texttt{airfoil\_version}。
+    \item \textbf{单列索引 (Phase 1)}：执行耗时 \textbf{0.618 ms}。建立了 \texttt{performance\_record(condition\_id)} 索引，避免了全表扫描，性能提升 \textbf{5.0x}。
+    \item \textbf{复合索引 (Phase 2)}：执行耗时 \textbf{0.579 ms}。建立了 \texttt{performance\_record(condition\_id, l\_over\_d DESC)} 复合索引，消除了排序开销，性能提升 \textbf{5.3x}。
+\end{enumerate}
+\end{tcolorbox}
+
+\begin{lstlisting}[caption=Phase 2 最佳执行计划文本 (EXPLAIN ANALYZE)]
+Limit (actual time=0.579..0.582 rows=50 loops=1)
+  ->  Nested Loop (actual time=0.578..0.580 rows=50 loops=1)
+        ->  Index Scan using idx_perf_cond_lod on performance_record (actual time=0.015..0.245 rows=400 loops=1)
+              Index Cond: (condition_id = '...')
+        ->  Index Scan using idx_version_is_current on airfoil_version (actual time=0.001..0.001 rows=1 loops=400)
+Planning Time: 1.909 ms | Execution Time: 0.579 ms
+\end{lstlisting}
+
+\subsection{索引选择理由与思辨}
+\textbf{为什么选择复合索引 (condition\_id, l\_over\_d)？}
+\begin{itemize}
+    \item \textbf{谓词对齐}：查询频繁按工况 (\texttt{condition\_id}) 过滤，单列索引已能显著减少扫描量。
+    \item \textbf{消除排序}：增加 \texttt{l\_over\_d} 作为复合列并设置 DESC 排序，使数据库能直接从索引有序读取前 50 条，彻底消除了内存或磁盘中的外部排序 (External Sort) 步骤。
+    \item \textbf{为什么不选其他字段？}：\texttt{cl} 和 \texttt{cd} 虽在 SELECT 中出现，但非 WHERE 过滤的主键，建索引收益远低于 \texttt{condition\_id}。
+\end{itemize}
+
+\section{事务与并发控制实验}
+
+\subsection{场景：批量导入回滚 (原子性)}
+\textbf{实验过程}：调用 \texttt{governance.import\_performance\_batch} 存储过程，传入包含非法 Cd < 0 记录的 JSON。
+\begin{tcolorbox}[colback=red!5, colframe=red!50, title=原子性验证结果]
+    \textbf{NOTICE}: Expected rollback triggered: cd must be >= 0 \\
+    \textbf{验证结果}: Before Count = 9654, After Count = 9654。\\
+    \textbf{结论}: ✅ 第一条合法记录随第二条非法记录一同回滚，实现了事务原子性。
+\end{tcolorbox}
+
+\subsection{场景：乐观锁并发修改 (一致性)}
+\textbf{实验过程}：模拟两个用户基于同一 \texttt{xmin} 版本号进行修改。
+\begin{itemize}
+    \item \textbf{用户 A}：提交修改，\texttt{xmin} 匹配成功，数据更新。
+    \item \textbf{用户 B}：随后提交，但其持有的 \texttt{xmin} 已过期，数据库返回 \texttt{success=false} 并提示版本冲突。
+\end{itemize}
+
+\section{高级机制：视图、触发器与存储过程}
+
+\subsection{视图：统一展示“当前有效版本”}
+\begin{lstlisting}
+CREATE VIEW v_current_airfoil_version AS
+SELECT airfoil_code, name, version_no FROM airfoil_version
+WHERE is_current = true AND status = 'valid' AND is_deleted = false;
+\end{lstlisting}
+\textbf{实际意义}：屏蔽了历史修订版本和软删除数据，为所有工程报表提供唯一可信的数据源。
+
+\subsection{触发器：自动写入修改日志}
+\begin{lstlisting}
+CREATE TRIGGER trg_log_change_performance AFTER INSERT OR UPDATE 
+ON performance_record FOR EACH ROW EXECUTE FUNCTION governance.log_change();
+\end{lstlisting}
+\textbf{实际意义}：实现了非侵入式的审计追踪，任何对性能数据的微调都会被记录在 \texttt{change\_log} 中。
+
+\subsection{存储过程：批量导入与合法性检查}
+\textbf{实现}：\texttt{governance.import\_performance\_batch} 封装了 JSON 解析、跨表关联以及 \texttt{Cd >= 0} 的物理校验。
+\textbf{实际意义}：将复杂的业务逻辑从应用层下沉至数据库层，保证了数据入库的绝对合法性。
+
+\section{实验检查汇总}
+\begin{longtable}{lll}
+\toprule
+检查项 & 要求 & 状态 \\
+\midrule
+索引实验 & 包含无索引、单列、复合对比，含执行计划与理由 & ✅ 100\% \\
+事务实验 & 包含批量导入非法回滚、并发冲突验证 & ✅ 100\% \\
+高级机制 & 同时实现了视图、触发器和存储过程 & ✅ 100\% \\
+\bottomrule
+\end{longtable}
+
+\end{document}

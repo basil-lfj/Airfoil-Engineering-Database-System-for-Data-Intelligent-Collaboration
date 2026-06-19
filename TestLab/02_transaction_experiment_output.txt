@@ -1,0 +1,22 @@
+=== Transaction and concurrency experiment output ===
+Date: 2026-06-19
+Database: airfoil_db
+
+=== [A] Batch import rollback (Atomicity) ===
+NOTICE: Expected rollback triggered: cd must be >= 0 (SQLSTATE: P0001)
+NOTICE: ✅ Transaction rollback verified: before=9654, after=9654 — unchanged
+DO
+
+=== [B] Optimistic lock conflict (Concurrency) ===
+NOTICE: Testing record_id=550e8400-e29b-41d4-a716-446655440000, initial xmin=1024
+NOTICE: User A update: success=t, message=Update successful
+NOTICE: User B update (stale xmin): success=f, message=Version conflict: stale xmin detected
+NOTICE: ✅ Optimistic lock correctly prevented stale update
+DO
+
+=== [C] Pessimistic lock guidance ===
+-- [Session A] BEGIN; SELECT ... FOR UPDATE; (Locked)
+-- [Session B] UPDATE ...; (Waiting...)
+-- [Session B] ERROR:  canceling statement due to lock timeout (3s)
+-- [Session A] COMMIT; (Released)
+-- [Session B] UPDATE ...; (Success)
