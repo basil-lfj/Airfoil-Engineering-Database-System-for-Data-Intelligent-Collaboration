@@ -129,7 +129,7 @@ def _insert_nl2sql_audit(
     error_types_json = json.dumps(error_types, ensure_ascii=False)
     sql = (
         "INSERT INTO public.nl2sql_audit(query_id, auditor_id, nl_question, generated_sql, audited_sql, audit_status, error_types_json, notes)\n"
-        f"VALUES ({_sql_quote(query_id)}, {_sql_quote(auditor_id)}, {_sql_quote(nl_question)}, {_sql_nullable(generated_sql)}, {_sql_nullable(audited_sql)}, {_sql_quote(audit_status)}, {_sql_quote(error_types_json)}, {_sql_quote(notes)})"
+        f"VALUES ({_sql_quote(query_id)}, {_sql_quote(auditor_id)}, {_sql_quote(nl_question)}, {_sql_quote(generated_sql or '')}, {_sql_nullable(audited_sql)}, {_sql_quote(audit_status)}, {_sql_quote(error_types_json)}, {_sql_quote(notes)})"
         ";"
     )
     run_psql(cfg.postgres, sql, csv=False, tuples_only=False, no_align=False, quiet=True)

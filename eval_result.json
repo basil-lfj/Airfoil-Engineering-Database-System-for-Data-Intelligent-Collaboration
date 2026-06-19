@@ -1,0 +1,374 @@
+{
+  "cases": 17,
+  "passed": 5,
+  "failed": 12,
+  "schema_compare": {
+    "total_compared": 12,
+    "improved_with_strong": 2,
+    "degraded_with_strong": 1,
+    "both_pass": 1,
+    "both_fail": 8,
+    "conclusion": "Strong schema 提示在 2/12 条用例中带来了改进，1/12 条退化，1/12 条无差异。"
+  },
+  "error_type_summary": {
+    "empty_sql": 8,
+    "weak_empty_sql": 6,
+    "weak_aggregate_misuse": 2,
+    "weak_llm_call_failed": 1,
+    "aggregate_misuse": 1,
+    "missing_join_condition": 1,
+    "weak_missing_join_condition": 1
+  },
+  "items": [
+    {
+      "case_id": "P01",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": false,
+      "notes": "result_mismatch",
+      "query_id": "62f3eb1e-9034-424c-8b28-aedb2bdcc668",
+      "generated_sql": "SELECT version_no, created_at FROM api.v_current_airfoil_version WHERE airfoil_code = 'NACA_0012'",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "approved",
+        "passed": true,
+        "notes": "ok",
+        "generated_sql": "SELECT av.version_no, av.created_at FROM api.v_current_airfoil_version vc JOIN airfoil_version av ON av.id = vc.version_id WHERE vc.airfoil_code = 'NACA_0012'",
+        "error_types": []
+      },
+      "schema_improvement": "degraded"
+    },
+    {
+      "case_id": "P02",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": true,
+      "notes": "ok",
+      "query_id": "6098ec4e-b752-4cd6-aa39-0640d8e1bec3",
+      "generated_sql": "SELECT cp.surface, cp.point_order, cp.x, cp.y FROM api.v_current_airfoil_version vcav JOIN public.coordinate_point cp ON vcav.version_id = cp.version_id WHERE vcav.airfoil_code = 'NACA_0012' AND cp.surface = 'upper' AND cp.is_deleted = false ORDER BY cp.point_order ASC LIMIT 20",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "approved",
+        "passed": false,
+        "notes": "result_mismatch",
+        "generated_sql": "WITH current_version AS (\n    SELECT v.version_id\n    FROM api.v_current_airfoil_version v\n    JOIN airfoil a ON v.airfoil_id = a.airfoil_id\n    WHERE a.airfoil_code = 'NACA_0012'\n)\nSELECT cp.x, cp.y\nFROM coordinate_point cp\nJOIN current_version cv ON cp.version_id = cv.version_id\nWHERE cp.surface = 'upper'\nORDER BY cp.point_order\nLIMIT 20",
+        "error_types": []
+      },
+      "schema_improvement": "improved"
+    },
+    {
+      "case_id": "P03",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "15b6e3f7-ea87-4011-b20e-8325500cacbb",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P04",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "e9343d63-5b43-4699-8006-ece9db04be12",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P05",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": false,
+      "notes": "result_mismatch",
+      "query_id": "918ec4ab-dedb-4229-839f-b5c03b8dfaef",
+      "generated_sql": "SELECT * FROM api.compare_airfoils_at_reynolds(ARRAY['NACA_0012', 'NACA_2412'], 3000000, true) ORDER BY airfoil_code, alpha_deg;",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P06",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "4d6160ec-c571-4dce-9773-c00df4c0ea95",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P07",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": false,
+      "notes": "result_mismatch",
+      "query_id": "3de12d8d-9a0f-4f4c-ad75-8c36d43da566",
+      "generated_sql": "SELECT delta_cd FROM api.compare_airfoil_versions('NACA_0012', 2, 3000000, 1, 2)",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P08",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": false,
+      "notes": "result_mismatch",
+      "query_id": "2e0d69ce-dfb5-41fc-8f69-fcdc8ee7ef24",
+      "generated_sql": "SELECT source_type, COUNT(*) AS total_records, COUNT(*) FILTER (WHERE is_anomaly) AS anomaly_count FROM performance_record WHERE is_deleted = false GROUP BY source_type",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "needs_fix",
+        "passed": false,
+        "notes": "possible GROUP BY inconsistency",
+        "generated_sql": "SELECT pr.source_type, COUNT(pr.id) AS record_count, COUNT(DISTINCT ar.performance_record_id) AS anomaly_count FROM performance_record pr LEFT JOIN anomaly_record ar ON pr.id = ar.performance_record_id GROUP BY pr.source_type",
+        "error_types": [
+          "aggregate_misuse"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P09",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": true,
+      "notes": "ok",
+      "query_id": "74e0366c-0813-4532-8c20-9ddf2f2ab4f1",
+      "generated_sql": "SELECT * FROM api.list_airfoils_with_anomalies(true) ORDER BY total_anomaly_hint DESC;",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "json parse failed after retries",
+        "generated_sql": null,
+        "error_types": [
+          "llm_call_failed"
+        ]
+      },
+      "schema_improvement": "improved"
+    },
+    {
+      "case_id": "P10",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "needs_fix",
+      "passed": false,
+      "notes": "possible GROUP BY inconsistency; possible missing join condition",
+      "query_id": "dc34f78d-3d56-45f7-89db-319d8e07bdd1",
+      "generated_sql": "WITH recent_logs AS (SELECT query_type, is_success FROM query_log ORDER BY at DESC LIMIT 50) SELECT query_type, COUNT(*) AS total, SUM(CASE WHEN is_success THEN 1 ELSE 0 END) AS success_count, ROUND(SUM(CASE WHEN is_success THEN 1 ELSE 0 END)::numeric / COUNT(*), 4) AS success_rate FROM recent_logs GROUP BY query_type",
+      "error_types": [
+        "aggregate_misuse",
+        "missing_join_condition"
+      ],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "needs_fix",
+        "passed": false,
+        "notes": "possible GROUP BY inconsistency; possible missing join condition",
+        "generated_sql": "WITH recent_logs AS (SELECT query_type, success FROM query_log ORDER BY created_at DESC LIMIT 50) SELECT query_type, CAST(SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) AS REAL) / COUNT(*) AS success_rate FROM recent_logs GROUP BY query_type;",
+        "error_types": [
+          "aggregate_misuse",
+          "missing_join_condition"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P11",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "b72e42c9-ee76-4cc4-bc56-5826391ab2eb",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "rejected",
+        "passed": false,
+        "notes": "empty sql",
+        "generated_sql": "",
+        "error_types": [
+          "empty_sql"
+        ]
+      },
+      "schema_improvement": "same_both_fail"
+    },
+    {
+      "case_id": "P12",
+      "kind": "positive",
+      "schema_mode": "strong",
+      "expected_audit_status": "approved",
+      "actual_audit_status": "approved",
+      "passed": true,
+      "notes": "ok",
+      "query_id": "33555d02-67c0-4038-b38c-7d38a79f7397",
+      "generated_sql": "SELECT u.username FROM api.v_current_airfoil_version v JOIN public.airfoil_version av ON v.version_id = av.version_id JOIN public.user_account u ON av.created_by = u.user_id WHERE v.airfoil_code = 'NACA_0012' LIMIT 1",
+      "error_types": [],
+      "weak": {
+        "schema_mode": "weak",
+        "actual_audit_status": "approved",
+        "passed": true,
+        "notes": "ok",
+        "generated_sql": "WITH current_version AS (SELECT version_id FROM api.v_current_airfoil_version WHERE airfoil_id = (SELECT id FROM airfoil WHERE airfoil_code = 'NACA_0012')) SELECT u.username FROM airfoil_version av JOIN user_account u ON av.created_by = u.id WHERE av.id = (SELECT version_id FROM current_version) LIMIT 1",
+        "error_types": []
+      },
+      "schema_improvement": "same_both_pass"
+    },
+    {
+      "case_id": "N01",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "expected_audit_status": "rejected",
+      "actual_audit_status": "rejected",
+      "passed": true,
+      "notes": "empty sql",
+      "query_id": "83dfd3f5-a456-44db-97fc-40572e30a182",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ]
+    },
+    {
+      "case_id": "N02",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "expected_audit_status": "needs_fix",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "6565a342-4857-48d4-b712-5968cfcb59b4",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ]
+    },
+    {
+      "case_id": "N03",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "expected_audit_status": "needs_fix",
+      "actual_audit_status": "rejected",
+      "passed": false,
+      "notes": "empty sql",
+      "query_id": "b604f4ca-57f3-435b-986a-5de85da9ea97",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ]
+    },
+    {
+      "case_id": "N04",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "expected_audit_status": "rejected",
+      "actual_audit_status": "rejected",
+      "passed": true,
+      "notes": "empty sql",
+      "query_id": "e8d6a18a-b54e-48fc-9538-6d33755d3a1b",
+      "generated_sql": "",
+      "error_types": [
+        "empty_sql"
+      ]
+    },
+    {
+      "case_id": "N05",
+      "kind": "negative",
+      "schema_mode": "strong",
+      "expected_audit_status": "needs_fix",
+      "actual_audit_status": "approved",
+      "passed": false,
+      "notes": "ok",
+      "query_id": "1b31188f-c475-41b4-9e09-e6af1abebd29",
+      "generated_sql": "SELECT version_no, created_at FROM api.v_current_airfoil_version WHERE airfoil_code = 'NACA_0012'",
+      "error_types": []
+    }
+  ]
+}
