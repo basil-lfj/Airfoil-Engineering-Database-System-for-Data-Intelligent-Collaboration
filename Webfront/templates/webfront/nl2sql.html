@@ -32,10 +32,6 @@
         <input type="text" id="questionInput" class="input"
                placeholder="例如：查询 NACA_2412 的当前有效版本"
                value="查询 NACA_2412 的当前有效版本">
-        <select id="schemaSelect">
-            <option value="strong">精确模式</option>
-            <option value="weak">宽松模式</option>
-        </select>
         <button id="submitBtn" class="btn btn-primary" style="padding:0.5rem 1.2rem;font-size:0.85rem;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             查询
@@ -157,7 +153,6 @@
 
 <script>
 const questionInput = document.getElementById('questionInput');
-const schemaSelect = document.getElementById('schemaSelect');
 const submitBtn = document.getElementById('submitBtn');
 const stepProgress = document.getElementById('stepProgress');
 const resultArea = document.getElementById('resultArea');
@@ -204,7 +199,7 @@ async function submitQuery() {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:0.3rem;vertical-align:middle;"></span> 查询中…';
 
-    const schemaMode = schemaSelect.value;
+    const schemaMode = 'strong';
 
     // 逐步推进动画
     setStepState(0, 'active');

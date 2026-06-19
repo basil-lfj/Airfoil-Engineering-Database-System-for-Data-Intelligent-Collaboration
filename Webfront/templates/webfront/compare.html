@@ -1,63 +1,119 @@
 {% extends 'webfront/base.html' %}
-{% block title %}翼型对比 · 翼型工程数据库{% endblock %}
+{% block title %}工程对比分析 · 翼型工程数据库{% endblock %}
 {% block content %}
 
 <div class="page-header">
-    <h1>多翼型性能对比</h1>
-    <p>输入多个翼型编码，查看相同雷诺数下的性能曲线</p>
+    <h1>翼型工程性能对比</h1>
+    <p>多维度气动性能量化对比 · 雷诺数：{{ reynolds }} · {{ summary|length }} 个翼型</p>
 </div>
 
-<div class="card">
-    <form method="get">
-        <div class="input-group">
-            <input type="text" name="codes" class="input" placeholder="翼型编码，逗号分隔（如 NACA_2412,NACA_4412,NACA_0006）" value="{{ codes_str }}" style="flex:2;">
-            <input type="number" name="reynolds" class="input" placeholder="雷诺数" value="{{ reynolds }}" style="max-width:160px;">
-            <button type="submit" class="btn btn-primary">对比</button>
+<!-- ── 筛选器 ── -->
+<div class="card" style="border-color:var(--accent-border);">
+    <form method="get" class="flex flex-wrap gap-3 items-center">
+        <div style="flex:1; min-width:300px;">
+            <label class="text-xs text-tertiary mb-1 block">翼型编码（逗号分隔）</label>
+            <input type="text" name="codes" class="input w-full" placeholder="例如：NACA_2412,NACA_4412,NACA_0012" value="{{ codes_str }}">
+        </div>
+        <div style="width:140px;">
+            <label class="text-xs text-tertiary mb-1 block">雷诺数 Re</label>
+            <input type="number" name="reynolds" class="input w-full" value="{{ reynolds }}">
+        </div>
+        <div style="padding-top:20px;">
+            <button type="submit" class="btn btn-primary">执行对比分析</button>
         </div>
     </form>
 </div>
 
 {% if result %}
-<div class="result-grid">
-    <div class="card card-flat">
-        <div class="card-header"><h2>Cl — α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
-        <div style="height:320px;" id="chart-cl"></div>
-    </div>
-    <div class="card card-flat">
-        <div class="card-header"><h2>Cd — α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
-        <div style="height:320px;" id="chart-cd"></div>
-    </div>
-</div>
-
+<!-- ── 关键工程参数概览 ── -->
 <div class="card card-flat">
-    <div class="card-header"><h2>升阻比 L/D — α 曲线</h2><span class="count">Re = {{ reynolds }}</span></div>
-    <div style="height:320px;" id="chart-ld"></div>
+    <div class="card-header">
+        <h2>关键工程参数对比 (Engineering Metrics)</h2>
+    </div>
+    <div class="table-wrap">
+        <table class="text-center">
+            <thead>
+                <tr>
+                    <th class="text-left">翼型编码</th>
+                    <th>最大升阻比 (L/D)<sub>max</sub></th>
+                    <th>最佳攻角 α<sub>opt</sub></th>
+                    <th>最大升力 Cl<sub>max</sub></th>
+                    <th>失速攻角 α<sub>stall</sub></th>
+                    <th>最小阻力 Cd<sub>min</sub></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in summary %}
+                <tr>
+                    <td class="text-left"><span class="tag tag-mono">{{ s.code }}</span></td>
+                    <td class="text-mono text-bold">{{ s.max_ld|floatformat:2 }}</td>
+                    <td class="text-mono">{{ s.opt_alpha }}°</td>
+                    <td class="text-mono">{{ s.max_cl|floatformat:3 }}</td>
+                    <td class="text-mono">{{ s.stall_alpha }}°</td>
+                    <td class="text-mono">{{ s.min_cd|floatformat:5 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<!-- ── 图表网格 ── -->
+<div class="result-grid" style="grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));">
+    <!-- 升力曲线 -->
+    <div class="card card-flat">
+        <div class="card-header"><h2>升力特性 (Cl — α)</h2></div>
+        <div style="height:380px;" id="chart-cl"></div>
+    </div>
+    
+    <!-- 阻力特性 -->
+    <div class="card card-flat">
+        <div class="card-header"><h2>阻力特性 (Cd — α)</h2></div>
+        <div style="height:380px;" id="chart-cd"></div>
+    </div>
+
+    <!-- 阻力极线 (核心图表) -->
+    <div class="card card-flat">
+        <div class="card-header"><h2>阻力极线 (Drag Polar: Cl — Cd)</h2></div>
+        <div style="height:380px;" id="chart-polar"></div>
+    </div>
+
+    <!-- 升阻比曲线 -->
+    <div class="card card-flat">
+        <div class="card-header"><h2>升阻比效率 (L/D — α)</h2></div>
+        <div style="height:380px;" id="chart-ld"></div>
+    </div>
+
+    <!-- 性能雷达图 -->
+    <div class="card card-flat" style="grid-column: span 2;">
+        <div class="card-header"><h2>综合性能评估 (Normalized Metrics)</h2></div>
+        <div style="height:480px;" id="chart-radar"></div>
+    </div>
+</div>
+
+<!-- ── 数据明细 ── -->
 <div class="card">
     <div class="card-header">
-        <h2>对比数据明细</h2>
-        <div class="flex items-center gap-3">
-            <span class="count">{{ result|length }} 条</span>
-            <button class="btn btn-sm" onclick="exportTableCSV('compareTable', 'compare_results.csv')">导出 CSV</button>
-        </div>
+        <h2>原始实验/计算数据明细</h2>
+        <button class="btn btn-sm" onclick="exportTableCSV('compareTable', 'airfoil_comparison.csv')">导出完整数据 (CSV)</button>
     </div>
     <div class="table-wrap" style="max-height:400px;overflow-y:auto;">
         <table id="compareTable">
             <thead>
-                <tr><th>翼型</th><th>攻角 (°)</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th></th></tr>
+                <tr>
+                    <th>翼型</th><th>攻角 (°)</th><th>Cl</th><th>Cd</th><th>L/D</th><th>来源</th><th>质量</th>
+                </tr>
             </thead>
             <tbody>
                 {% for r in result %}
-                <tr>
-                    <td><a href="{% url 'webfront:airfoil_detail' r.airfoil_code %}" class="link link-mono">{{ r.airfoil_code }}</a></td>
+                <tr {% if r.is_anomaly %}style="background:var(--red-bg);"{% endif %}>
+                    <td class="text-mono">{{ r.airfoil_code }}</td>
                     <td class="text-mono">{{ r.alpha_deg }}</td>
                     <td class="text-mono">{{ r.cl|floatformat:4 }}</td>
                     <td class="text-mono">{{ r.cd|floatformat:6 }}</td>
-                    <td class="text-mono">{% if r.l_over_d %}{{ r.l_over_d|floatformat:1 }}{% else %}—{% endif %}</td>
-                    <td><span class="tag {% if r.source_type == 'real' %}tag-green{% else %}tag-blue{% endif %}">{{ r.source_type }}</span></td>
-                    <td>{% if r.is_anomaly %}<span class="tag tag-red">异常</span>{% endif %}</td>
-                    <td><a class="btn btn-sm btn-ghost" href="{% url 'webfront:visualize' %}?codes={{ r.airfoil_code }}&reynolds={{ reynolds }}">可视化</a></td>
+                    <td class="text-mono">{{ r.l_over_d|floatformat:2 }}</td>
+                    <td><span class="tag tag-blue">{{ r.source_type }}</span></td>
+                    <td>{% if r.is_anomaly %}<span class="tag tag-red">异常</span>{% else %}<span class="tag tag-green">合格</span>{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -67,46 +123,126 @@
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script>
-(function(){
-    var data = {{ result|safe }};
-    var codes = [...new Set(data.map(function(d){ return d.airfoil_code; }))];
-    var colors = ['#0b1a2e','#2563eb','#059669','#d97706','#dc2626','#8b5cf6','#ec4899'];
+document.addEventListener('DOMContentLoaded', function() {
+    var data = {{ result_json|safe }};
+    var summary = {{ summary_json|safe }};
+    
+    var codes = summary.map(function(s){ return s.code; });
+    var colors = ['#0f172a','#2563eb','#059669','#d97706','#dc2626','#8b5cf6','#ec4899'];
 
-    function buildSeries(metric, yName) {
-        return codes.map(function(code, i) {
-            var points = data.filter(function(d){ return d.airfoil_code === code; }).sort(function(a,b){ return a.alpha_deg - b.alpha_deg; });
+    
+    var TOOLBOX = { feature: { saveAsImage: { title: '保存' }, dataZoom: { title: { zoom: '缩放', back: '重置' } } } };
+
+    // ── 核心绘图函数 ──
+    function createLineChart(id, title, xMetric, yMetric, xName, yName) {
+        var dom = document.getElementById(id);
+        if (!dom) return null;
+        var chart = echarts.init(dom);
+        var series = codes.map(function(code, i){
+            var points = data.filter(function(d){ return d.airfoil_code === code; }).sort(function(a,b){ return parseFloat(a[xMetric] || 0) - parseFloat(b[xMetric] || 0); });
             return {
-                name: code,
-                type: 'line',
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 4,
-                lineStyle: { width: 2 },
-                data: points.map(function(d){ return [parseFloat(d.alpha_deg), parseFloat(d[metric] || 0)]; }),
+                name: code, type: 'line', smooth: true, symbolSize: 6,
+                data: points.map(function(d){ return [parseFloat(d[xMetric] || 0), parseFloat(d[yMetric] || 0)]; }),
                 itemStyle: { color: colors[i % colors.length] }
             };
         });
-    }
-
-    function makeChart(el, series, yName) {
-        var chart = echarts.init(document.getElementById(el));
         chart.setOption({
-            tooltip: { trigger: 'axis' },
-            legend: { data: codes, bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 11 } },
-            grid: { left: 55, right: 20, top: 20, bottom: 40 },
-            xAxis: { type: 'value', name: '攻角 α (°)', nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
-            yAxis: { type: 'value', name: yName, nameTextStyle: { fontSize: 11, color: '#94a3b8' } },
+            tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+            legend: { bottom: 0, icon: 'circle', itemGap: 15, textStyle: { fontSize: 11 } },
+            grid: { top: 45, left: 60, right: 30, bottom: 85 },
+            toolbox: TOOLBOX,
+            xAxis: { 
+                type: 'value', 
+                name: xName, 
+                nameLocation: 'middle', 
+                nameGap: 35, 
+                nameTextStyle: { color: '#94a3b8', fontSize: 11 },
+                splitLine: { lineStyle: { type: 'dashed' } } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: yName, 
+                nameTextStyle: { color: '#94a3b8', fontSize: 11 },
+                splitLine: { lineStyle: { type: 'dashed' } } 
+            },
             series: series
         });
-        window.addEventListener('resize', function(){ chart.resize(); });
+        return chart;
     }
 
-    makeChart('chart-cl', buildSeries('cl', '升力系数 Cl'));
-    makeChart('chart-cd', buildSeries('cd', '阻力系数 Cd'));
-    makeChart('chart-ld', buildSeries('l_over_d', '升阻比 L/D'));
-})();
+    createLineChart('chart-cl', '升力系数', 'alpha_deg', 'cl', '攻角 α (°)', 'Cl');
+    createLineChart('chart-cd', '阻力系数', 'alpha_deg', 'cd', '攻角 α (°)', 'Cd');
+    createLineChart('chart-ld', '升阻比', 'alpha_deg', 'l_over_d', '攻角 α (°)', 'L/D');
+    createLineChart('chart-polar', '阻力极线', 'cd', 'cl', '阻力系数 Cd', '升力系数 Cl');
+
+    // ── 雷达图：多维度性能评估 ──
+    (function(){
+        var dom = document.getElementById('chart-radar');
+        if (!dom || summary.length === 0) return;
+        var radarChart = echarts.init(dom);
+        
+        // 归一化函数
+        var maxValues = { max_cl: 0.1, max_ld: 0.1, min_cd_inv: 0.1, stall_alpha: 0.1 };
+        
+        var radarData = summary.map(function(s){
+            var min_cd_inv = 1.0 / (parseFloat(s.min_cd) || 0.001); // 阻力越小分越高
+            maxValues.max_cl = Math.max(maxValues.max_cl, parseFloat(s.max_cl) || 0);
+            maxValues.max_ld = Math.max(maxValues.max_ld, parseFloat(s.max_ld) || 0);
+            maxValues.min_cd_inv = Math.max(maxValues.min_cd_inv, min_cd_inv);
+            maxValues.stall_alpha = Math.max(maxValues.stall_alpha, parseFloat(s.stall_alpha) || 0);
+            return { name: s.code, raw: [parseFloat(s.max_cl)||0, parseFloat(s.max_ld)||0, min_cd_inv, parseFloat(s.stall_alpha)||0] };
+        });
+
+        radarChart.setOption({
+            tooltip: { trigger: 'item' },
+            legend: { bottom: 0, data: codes, itemGap: 20, padding: [10, 0] },
+            radar: {
+                center: ['50%', '48%'],
+                radius: '55%',
+                indicator: [
+                    { name: '最大升力 Cl_max', max: maxValues.max_cl * 1.1 },
+                    { name: '最大升阻比 (L/D)_max', max: maxValues.max_ld * 1.1 },
+                    { name: '阻力效率 (1/Cd_min)', max: maxValues.min_cd_inv * 1.1 },
+                    { name: '失速角 alpha_stall', max: maxValues.stall_alpha * 1.1 }
+                ],
+                shape: 'circle',
+                splitNumber: 5,
+                axisName: { color: '#4b5565', padding: [5, 10], fontSize: 11 },
+                splitLine: { lineStyle: { color: '#e2e6ec' } },
+                splitArea: { areaStyle: { color: ['rgba(245,247,250,0.3)', 'rgba(245,247,250,0.6)'] } }
+            },
+            series: [{
+                type: 'radar',
+                data: radarData.map(function(d, i){
+                    return {
+                        value: d.raw, name: d.name,
+                        itemStyle: { color: colors[i % colors.length] },
+                        areaStyle: { opacity: 0.1 }
+                    };
+                })
+            }]
+        });
+    })();
+
+    window.addEventListener('resize', function(){
+        ['chart-cl', 'chart-cd', 'chart-ld', 'chart-polar', 'chart-radar'].forEach(function(id) {
+            var inst = echarts.getInstanceByDom(document.getElementById(id));
+            if (inst) inst.resize();
+        });
+    });
+});
 </script>
 {% elif codes_str %}
-<div class="alert alert-warn">未找到对比数据，请检查翼型编码是否正确</div>
+<div class="empty">
+    <div class="empty-title">未找到对比数据</div>
+    <div class="empty-desc">请确认翼型编码是否存在，或该雷诺数下是否有记录</div>
+    <a href="{% url 'webfront:airfoil_list' %}" class="btn">返回列表</a>
+</div>
 {% endif %}
+
+<style>
+    .text-bold { font-weight: 600; color: var(--brand); }
+    .tag-mono { font-family: var(--font-mono); font-size: 0.85em; background: var(--fill-active); }
+</style>
+
 {% endblock %}

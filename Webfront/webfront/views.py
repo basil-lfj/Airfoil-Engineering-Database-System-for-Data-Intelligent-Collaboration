@@ -1,8 +1,10 @@
 import logging
+import json
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 from .services import airfoil_service
 
@@ -22,21 +24,176 @@ def index(request):
     })
 
 
+@require_http_methods(["GET", "POST"])
 def airfoil_list(request):
+    """
+    翼型全功能列表页面（GET：展示列表+表单；POST：新增/编辑/删除）
+    """
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+        code = request.POST.get('code', '').strip()
+
+        # ── 删除 ──
+        if action == 'delete':
+            result = airfoil_service.delete_airfoil(code)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(result)
+            return redirect(f'{request.path}?{"success=删除成功" if result["success"] else "error=" + result["error"]}')
+
+        # ── 新增 ──
+        if action == 'create':
+            name = request.POST.get('name', '').strip()
+            family = request.POST.get('family', '').strip()
+            category = request.POST.get('category', '').strip()
+            source_type = request.POST.get('source_type', '').strip() or 'imported'
+            is_generated = request.POST.get('is_generated', 'false') == 'true'
+            remark = request.POST.get('remark', '').strip()
+            provider = request.POST.get('provider', '').strip()
+
+            # 服务端校验
+            errors = []
+            if not code:
+                errors.append('翼型编码不能为空')
+            elif len(code) > 100:
+                errors.append('翼型编码不能超过100个字符')
+            if not name:
+                errors.append('翼型名称不能为空')
+            elif len(name) > 200:
+                errors.append('翼型名称不能超过200个字符')
+
+            if errors:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': '; '.join(errors)})
+                return redirect(f'{request.path}?error={"".join(errors)}')
+
+            result = airfoil_service.create_airfoil(
+                code=code, name=name, family=family,
+                category=category, source_type=source_type,
+                is_generated=is_generated, remark=remark,
+                provider=provider,
+            )
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(result)
+            return redirect(f'{request.path}?{"success=新增成功" if result["success"] else "error=" + result["error"]}')
+
+        # ── 编辑 ──
+        if action == 'update':
+            name = request.POST.get('name', '').strip()
+            family = request.POST.get('family', '').strip()
+            category = request.POST.get('category', '').strip()
+            is_generated_str = request.POST.get('is_generated', '')
+            remark = request.POST.get('remark', '').strip()
+
+            kw = {}
+            if name:
+                kw['name'] = name
+            if family:
+                kw['family'] = family
+            if category:
+                kw['category'] = category
+            if is_generated_str:
+                kw['is_generated'] = is_generated_str == 'true'
+            if remark:
+                kw['remark'] = remark
+
+            result = airfoil_service.update_airfoil(code=code, **kw)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse(result)
+            return redirect(f'{request.path}?{"success=更新成功" if result["success"] else "error=" + result["error"]}')
+
+        return redirect(f'{request.path}?error=未知操作')
+
+    # ── GET：展示列表页面 ──
     airfoils = airfoil_service.get_all_airfoils()
-    return render(request, 'webfront/airfoil_list.html', {'airfoils': airfoils})
+    sources = airfoil_service.get_all_data_sources()
+    error = request.GET.get('error', '')
+    success = request.GET.get('success', '')
+    return render(request, 'webfront/airfoil_list.html', {
+        'airfoils': airfoils,
+        'sources': sources,
+        'error': error,
+        'success': success,
+    })
 
 
+@require_http_methods(["GET", "POST"])
 def airfoil_detail(request, code):
+    """翼型详情页 + 版本/坐标/性能数据管理 POST"""
+    if request.method == "POST":
+        action = request.POST.get('action', '')
+
+        # ── 版本管理 ──
+        if action == 'create_version':
+            version_type = request.POST.get('version_type', '').strip()
+            change_note = request.POST.get('change_note', '').strip()
+            result = airfoil_service.create_version(code, version_type, change_note)
+            return JsonResponse(result)
+
+        if action == 'delete_version':
+            version_id = request.POST.get('version_id', '').strip()
+            result = airfoil_service.delete_version(version_id)
+            return JsonResponse(result)
+
+        # ── 坐标点管理 ──
+        if action == 'create_coordinates':
+            import json
+            try:
+                points_json = request.POST.get('points', '[]')
+                points = json.loads(points_json)
+            except (json.JSONDecodeError, TypeError):
+                points = []
+            if not points:
+                return JsonResponse({'success': False, 'error': '坐标点数据格式错误'})
+            result = airfoil_service.create_coordinate_points(code, points)
+            return JsonResponse(result)
+
+        if action == 'delete_coordinates':
+            import json
+            try:
+                point_ids_json = request.POST.get('point_ids', '[]')
+                point_ids = json.loads(point_ids_json)
+            except (json.JSONDecodeError, TypeError):
+                point_ids = []
+            result = airfoil_service.delete_coordinate_points(point_ids)
+            return JsonResponse(result)
+
+        # ── 性能数据管理 ──
+        if action == 'create_performance':
+            try:
+                alpha_deg = float(request.POST.get('alpha_deg', 0))
+                reynolds_number = float(request.POST.get('reynolds_number', 0))
+                cl = float(request.POST.get('cl', 0))
+                cd = float(request.POST.get('cd', 0))
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'error': '数值格式错误'})
+            source_type = request.POST.get('source_type', 'experimental').strip()
+            result = airfoil_service.create_performance_record(
+                code, alpha_deg, reynolds_number, cl, cd, source_type=source_type
+            )
+            return JsonResponse(result)
+
+        if action == 'delete_performance':
+            record_id = request.POST.get('record_id', '').strip()
+            result = airfoil_service.delete_performance_record(record_id)
+            return JsonResponse(result)
+
+        return JsonResponse({'success': False, 'error': '未知操作'})
+
+    # ── GET：展示翼型详情 ──
     result = airfoil_service.get_airfoil_detail(code)
     if result[0] is None:
         return render(request, 'webfront/404.html', {'code': code}, status=404)
     airfoil, geometry, versions, performances = result
+
+    # 获取单独的性能列表（供管理页面用）
+    perf_list = airfoil_service.get_performance_records(code)
+
     return render(request, 'webfront/airfoil_detail.html', {
         'airfoil': airfoil,
         'geometry': geometry,
         'versions': versions,
         'performances': performances,
+        'perf_list': perf_list,
         'code': code,
     })
 
@@ -62,30 +219,104 @@ def search_airfoils(request):
     })
 
 
+import json
+from decimal import Decimal
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super(DecimalEncoder, self).default(obj)
+
 def compare_airfoils(request):
     codes_str = request.GET.get('codes', '')
     reynolds_str = request.GET.get('reynolds', '100000')
     result = []
+    summary = []
 
     if codes_str:
         codes = [c.strip() for c in codes_str.split(',') if c.strip()]
         if codes and reynolds_str:
             result = airfoil_service.compare_airfoils(codes, reynolds_str)
+            
+            # 计算摘要统计
+            for code in codes:
+                points = [p for p in result if p['airfoil_code'] == code]
+                if not points: continue
+                
+                max_cl = max(p['cl'] for p in points)
+                max_ld = max(p['l_over_d'] for p in points if p['l_over_d'] is not None)
+                min_cd = min(p['cd'] for p in points)
+                # 寻找最大升阻比对应的攻角
+                opt_alpha = next(p['alpha_deg'] for p in points if p['l_over_d'] == max_ld)
+                # 失速角（粗略估计：Cl 达到最大时的攻角）
+                stall_alpha = next(p['alpha_deg'] for p in points if p['cl'] == max_cl)
+                
+                summary.append({
+                    'code': code,
+                    'max_cl': float(max_cl),
+                    'max_ld': float(max_ld),
+                    'min_cd': float(min_cd),
+                    'opt_alpha': float(opt_alpha),
+                    'stall_alpha': float(stall_alpha)
+                })
     else:
         suggested = airfoil_service.get_suggested_airfoils()
         codes_str = ','.join(r['airfoil_code'] for r in suggested)
 
+    # 转换 result 中的 Decimal，便于直接转 JSON
+    safe_result = []
+    for r in result:
+        safe_r = {}
+        for k, v in r.items():
+            if isinstance(v, Decimal):
+                safe_r[k] = float(v)
+            else:
+                safe_r[k] = v
+        safe_result.append(safe_r)
+
     return render(request, 'webfront/compare.html', {
         'codes_str': codes_str,
         'reynolds': reynolds_str,
-        'result': result,
+        'result': safe_result,
+        'result_json': json.dumps(safe_result, cls=DecimalEncoder),
+        'summary': summary,
+        'summary_json': json.dumps(summary, cls=DecimalEncoder),
     })
 
 
 def anomaly_list(request):
+    """异常数据列表页（GET）"""
     anomalies = airfoil_service.get_anomalies()
-    return render(request, 'webfront/anomaly_list.html', {'anomalies': anomalies})
+    detail_stats = airfoil_service.get_anomaly_detail_stats()
+    return render(request, 'webfront/anomaly_list.html', {
+        'anomalies': anomalies,
+        'detail_stats': detail_stats,
+    })
 
+
+@require_http_methods(["POST"])
+def anomaly_scan_api(request):
+    """
+    POST /anomalies/scan/
+    触发全库异常检测扫描
+    """
+    result = airfoil_service.scan_all_performance()
+    return JsonResponse(result)
+
+
+@require_http_methods(["GET"])
+def anomaly_detail_api(request):
+    """
+    GET /anomalies/api/detail/
+    返回异常统计详情（按翼型/按规则/按时间）
+    """
+    stats = airfoil_service.get_anomaly_detail_stats()
+    annotations = airfoil_service.get_anomaly_annotations()
+    return JsonResponse({'stats': stats, 'annotations': annotations})
+
+
+# ── 翼型数据管理 CRUD ─────────────────────────────────────────────
 
 def visualize(request):
     top_performers = airfoil_service.get_top_performers()

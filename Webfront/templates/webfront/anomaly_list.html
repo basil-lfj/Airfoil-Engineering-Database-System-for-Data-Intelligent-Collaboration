@@ -1,15 +1,66 @@
 {% extends 'webfront/base.html' %}
-{% block title %}异常数据 · 翼型工程数据库{% endblock %}
+{% block title %}异常检测 · 翼型工程数据库{% endblock %}
 {% block content %}
 
 <div class="page-header">
-    <h1>异常数据</h1>
-    <p>异常规则检测到的可疑性能记录 · 数据治理结果</p>
+    <h1>异常检测中心</h1>
+    <p>多层规则引擎检测 · 数据质量治理 · 实时扫描</p>
 </div>
 
+<!-- ── 统计卡片 ── -->
+<div class="stat-grid">
+    <div class="stat"><div class="stat-num">{{ anomalies|length }}</div><div class="stat-label">异常记录总数</div></div>
+    <div class="stat"><div class="stat-num">
+        {% for s in detail_stats.by_status %}{% if s.status == 'open' %}{{ s.cnt }}{% endif %}{% endfor %}
+    </div><div class="stat-label">待确认</div></div>
+    <div class="stat"><div class="stat-num">8</div><div class="stat-label">检测规则数</div></div>
+    <div class="stat"><div class="stat-num"><button class="btn btn-primary btn-sm" onclick="scanAnomalies()" id="scanBtn">扫描</button></div><div class="stat-label">触发全库检测</div></div>
+</div>
+
+<!-- ── 按严重度分布 ── -->
+<div class="result-grid" style="margin-bottom:var(--space-5);">
+    <div class="card card-flat">
+        <div class="card-header"><h2>按等级分布</h2></div>
+        <div style="height:240px;" id="chart-by-severity"></div>
+    </div>
+    <div class="card card-flat">
+        <div class="card-header"><h2>按规则分布</h2></div>
+        <div style="height:240px;" id="chart-by-rule"></div>
+    </div>
+</div>
+
+<!-- ── 规则说明 ── -->
+<div class="card card-flat">
+    <div class="card-header">
+        <h2>检测规则体系</h2>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>规则编码</th><th>描述</th><th>严重度</th><th>数量</th></tr>
+            </thead>
+            <tbody>
+                {% for r in detail_stats.by_rule %}
+                <tr>
+                    <td><span class="tag tag-red text-mono">{{ r.rule_code }}</span></td>
+                    <td class="text-secondary">{{ r.description }}</td>
+                    <td>
+                        {% if r.severity == 'high' %}<span class="tag tag-red">高</span>
+                        {% elif r.severity == 'medium' %}<span class="tag tag-amber">中</span>
+                        {% else %}<span class="tag tag-blue">低</span>{% endif %}
+                    </td>
+                    <td class="text-mono">{{ r.cnt }}（待确认 {{ r.open_cnt }}）</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── 异常记录列表 ── -->
 <div class="card">
     <div class="card-header">
-        <h2>异常记录</h2>
+        <h2>异常记录明细</h2>
         <div class="flex items-center gap-3">
             <span class="count">{{ anomalies|length }} 条</span>
             <button class="btn btn-sm" onclick="exportTableCSV('anomalyTable', 'anomalies.csv')">导出 CSV</button>
@@ -42,14 +93,82 @@
                         {% elif a.status == 'confirmed' %}<span class="tag tag-amber">已确认</span>
                         {% else %}<span class="tag tag-gray">已忽略</span>{% endif %}
                     </td>
-                    <td style="max-width:280px;font-size:var(--text-xs);word-break:break-all;color:var(--text-secondary);">{{ a.details }}</td>
+                    <td style="max-width:320px;font-size:var(--text-xs);word-break:break-all;color:var(--text-secondary);">{{ a.details }}</td>
                     <td class="text-mono text-sm">{{ a.detected_at|date:"Y-m-d H:i" }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6"><div class="empty"><div class="empty-title">暂无异常数据</div><div class="empty-desc">数据质量良好，未触发任何异常规则</div></div></td></tr>
+                <tr><td colspan="6"><div class="empty"><div class="empty-title">暂无异常数据</div><div class="empty-desc">数据质量良好，未触发任何异常规则 · 点击"扫描"按钮触发全库检测</div></div></td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+/* ── 全库扫描 ── */
+function scanAnomalies() {
+    var btn = document.getElementById('scanBtn');
+    btn.disabled = true;
+    btn.textContent = '扫描中…';
+    var form = new FormData();
+    form.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    fetch('{% url "webfront:anomaly_scan_api" %}', { method: 'POST', body: form })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            btn.textContent = '扫描完成 (' + d.new_anomalies + ' 新增)';
+            setTimeout(function(){ location.reload(); }, 1500);
+        })
+        .catch(function(e){
+            btn.textContent = '扫描失败';
+            btn.disabled = false;
+        });
+}
+
+/* ── 图表：按等级分布 ── */
+{% if detail_stats.by_severity %}
+(function(){
+    var data = {{ detail_stats.by_severity|safe }};
+    var colors = {high: '#dc2626', medium: '#d97706', low: '#2563eb'};
+    var labels = {high: '高严重度', medium: '中严重度', low: '低严重度'};
+    var c = echarts.init(document.getElementById('chart-by-severity'));
+    c.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+        series: [{
+            type: 'pie', radius: ['40%','70%'],
+            data: data.map(function(d){
+                return { name: labels[d.severity] || d.severity, value: parseInt(d.cnt),
+                         itemStyle: { color: colors[d.severity] || '#94a3b8' } };
+            }),
+            label: { show: true, fontSize: 11, formatter: '{b}\n{c}' },
+            itemStyle: { borderRadius: 6, borderColor: '#fff', borderWidth: 2 }
+        }]
+    });
+})();
+{% endif %}
+
+/* ── 图表：按规则分布 ── */
+{% if detail_stats.by_rule %}
+(function(){
+    var data = {{ detail_stats.by_rule|safe }}.filter(function(d){ return d.cnt > 0; });
+    var colors = {high: '#dc2626', medium: '#d97706', low: '#2563eb'};
+    var c = echarts.init(document.getElementById('chart-by-rule'));
+    c.setOption({
+        tooltip: { trigger: 'item', formatter: '{b}<br/>数量: {c} ({d}%)' },
+        legend: { bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 } },
+        series: [{
+            type: 'pie', radius: ['35%','65%'],
+            center: ['50%', '45%'],
+            data: data.map(function(d){
+                return { name: d.rule_code, value: parseInt(d.cnt),
+                         itemStyle: { color: colors[d.severity] || '#94a3b8' } };
+            }),
+            label: { show: false },
+            itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 }
+        }]
+    });
+})();
+{% endif %}
+</script>
+{% csrf_token %}
 {% endblock %}

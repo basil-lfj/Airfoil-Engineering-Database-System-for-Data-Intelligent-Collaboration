@@ -72,9 +72,13 @@
         <div style="height:320px;" id="chart-anomaly-detection"></div>
     </div>
     <div class="card card-flat">
-        <div class="card-header"><h2>数据规模总览</h2></div>
-        <div style="height:320px;" id="chart-data-overview"></div>
+        <div class="card-header"><h2>异常按翼型分布</h2></div>
+        <div style="height:320px;" id="chart-anomaly-by-airfoil"></div>
     </div>
+</div>
+<div class="card card-flat">
+    <div class="card-header"><h2>检测规则分布</h2></div>
+    <div style="height:240px;" id="chart-anomaly-by-rule"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
@@ -253,39 +257,74 @@ loadMultiComparison();
 
 loadChart('{% url "webfront:visualize_api_anomaly_detection" %}', 'chart-anomaly-detection', function(data){
     var stats = data.stats || [];
+    var colors = [];
+    stats.forEach(function(d){
+        if (d.severity === 'high') colors.push('#dc2626');
+        else if (d.severity === 'medium') colors.push('#d97706');
+        else colors.push('#2563eb');
+    });
     return {
-        tooltip: { trigger: 'item' },
+        tooltip: { trigger: 'item', formatter: function(p){ return p.name + '<br/>数量: ' + p.value + '<br/>占比: ' + p.percent + '%'; } },
         toolbox: TOOLBOX,
+        legend: { bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 } },
         series: [{
-            type: 'pie', radius: ['40%','70%'],
-            data: stats.map(function(d){ return { name: d.rule_code, value: parseInt(d.cnt) }; }),
-            label: { fontSize: 11 },
+            type: 'pie', radius: ['35%','65%'],
+            data: stats.map(function(d){ return { name: d.rule_code + ' (' + d.severity + ')', value: parseInt(d.cnt) }; }),
+            label: { fontSize: 10 },
             itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-            color: ['#dc2626','#d97706','#059669','#2563eb']
+            color: ['#dc2626','#d97706','#059669','#2563eb','#8b5cf6','#ec4899','#14b8a6','#f97316']
         }]
     };
 });
 
-loadChart('{% url "webfront:visualize_api_data_overview" %}', 'chart-data-overview', function(data){
-    var items = [
-        { name: '翼型总数', value: parseInt(data.airfoil_count || 0) },
-        { name: '数据版本', value: parseInt(data.version_count || 0) },
-        { name: '几何坐标点', value: parseInt(data.coord_count || 0) },
-        { name: '性能记录', value: parseInt(data.perf_count || 0) },
-        { name: '异常标记', value: parseInt(data.anomaly_count || 0) }
-    ];
-    return {
-        tooltip: { trigger: 'item' },
-        toolbox: TOOLBOX,
-        series: [{
-            type: 'pie', radius: ['30%','60%'],
-            data: items,
-            label: { fontSize: 11, formatter: '{b}: {c}' },
-            itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-            color: ['#0b1a2e','#2563eb','#059669','#d97706','#dc2626']
-        }]
-    };
-});
+/* ── 加载异常详情的两个新图表 ── */
+fetch('{% url "webfront:anomaly_detail_api" %}')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+        var stats = data.stats || {};
+
+        // 按翼型分布
+        var airfoilData = stats.by_airfoil || [];
+        if (airfoilData.length > 0) {
+            var c1 = echarts.init(document.getElementById('chart-anomaly-by-airfoil'));
+            c1.setOption({
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                toolbox: TOOLBOX,
+                grid: { left: 10, right: 20, top: 30, bottom: 40, containLabel: true },
+                xAxis: { type: 'category',
+                    data: airfoilData.map(function(d){ return d.airfoil_code; }),
+                    axisLabel: { rotate: 35, fontSize: 9, fontFamily: "'JetBrains Mono',monospace" }
+                },
+                yAxis: { type: 'value', name: '异常数' },
+                series: [{
+                    type: 'bar', barMaxWidth: 20,
+                    data: airfoilData.map(function(d){ return parseInt(d.cnt); }),
+                    itemStyle: { color: '#dc2626', borderRadius: [3,3,0,0] }
+                }]
+            });
+        }
+
+        // 按规则分布
+        var ruleData = stats.by_rule || [];
+        if (ruleData.length > 0) {
+            var c2 = echarts.init(document.getElementById('chart-anomaly-by-rule'));
+            var colors = {high: '#dc2626', medium: '#d97706', low: '#2563eb'};
+            c2.setOption({
+                tooltip: { trigger: 'item' },
+                toolbox: TOOLBOX,
+                legend: { bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 } },
+                series: [{
+                    type: 'pie', radius: ['30%','60%'],
+                    data: ruleData.map(function(d){
+                        return { name: d.rule_code, value: parseInt(d.cnt),
+                                 itemStyle: { color: colors[d.severity] || '#94a3b8' } };
+                    }),
+                    label: { fontSize: 10, formatter: '{b}: {c}' },
+                    itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 }
+                }]
+            });
+        }
+    });
 
 function refreshAllCharts() {
     loadClAlpha();

@@ -233,12 +233,12 @@ Django 6.0.5 构建的数据管理与可视化平台。
 | 路由 | 模板 | 功能 |
 |:-----|:------|:------|
 | `/` | `index.html` | 系统总览仪表盘（ECharts 排行 + 异常统计） |
-| `/airfoils/` | `airfoil_list.html` | 翼型列表 + CSV 导出 |
-| `/airfoils/<code>/` | `airfoil_detail.html` | 翼型详情（几何/版本/性能） |
+| `/airfoils/` | `airfoil_list.html` | 翼型全功能列表页（新增/编辑/删除 + CSV 导出） |
+| `/airfoils/<code>/` | `airfoil_detail.html` | 翼型详情（几何/版本/坐标/性能 CRUD） |
 | `/search/` | `search.html` | 按名称/工况 Tab 切换搜索 |
-| `/compare/` | `compare.html` | 多翼型性能对比 + ECharts + CSV 导出 |
-| `/visualize/` | `visualize.html` | 6 张 ECharts 实时图表 + 数据筛选器 |
-| `/anomalies/` | `anomaly_list.html` | 异常数据列表 + CSV 导出 |
+| `/compare/` | `compare.html` | **工程性能对比分析**（Drag Polar + 雷达图 + 5 参数概览表） |
+| `/visualize/` | `visualize.html` | 9 张 ECharts 实时图表 + 数据筛选器 |
+| `/anomalies/` | `anomaly_list.html` | **异常检测中心**（等级/规则分布图 + 规则体系表 + 全库扫描） |
 | `/nl2sql/` | `nl2sql.html` | NL2SQL 前端界面 + 历史记录 + CSV 导出 |
 | `/nl2sql/audits/` | `nl2sql_audit_list.html` | SQL 审计列表 |
 | `/nl2sql/explain-audits/` | `explain_audit_list.html` | 解释审计列表 |
@@ -254,23 +254,27 @@ Django 6.0.5 构建的数据管理与可视化平台。
 
 ### ECharts 可视化
 
-7 张实时图表（AJAX 数据加载），全部支持 `dataZoom` 缩放 + 导出 PNG：
+13 张实时图表（AJAX 数据加载），全部支持 `dataZoom` 缩放 + 导出 PNG：
 
 | 图表 | 位置 |
 |:-----|:------|
 | 翼型性能排行（柱状图） | 总览 / 可视化 |
 | 异常规则统计（饼图） | 总览 / 可视化 |
 | 翼型轮廓对比 | 可视化 |
-| Cl-α 曲线（折线图） | 可视化 |
-| Cd/L-D 曲线（折线图） | 可视化 |
+| Cl-α 曲线（折线图） | 可视化 / 对比 |
+| Cd/L-D 曲线（折线图） | 可视化 / 对比 |
 | 多翼型性能对比（折线图） | 可视化 |
 | 数据规模总览（饼图） | 可视化 |
+| **Drag Polar 阻力极线（Cl vs Cd）** | 对比 |
+| **四维性能雷达图（综合评估）** | 对比 |
+| **异常等级分布（高/中/低环形图）** | 异常检测中心 |
+| **按规则分布饼图** | 异常检测中心 |
 
 ### 架构设计
 
-- **DAO 层**: `services/dao/` 按月业务拆分（statistics / airfoil / anomaly）
+- **DAO 层**: `services/dao/` 按月业务拆分（statistics / airfoil / anomaly / anomaly_engine）
 - **Service 层**: `airfoil_service.py` 作为 Facade，向后兼容
-- **View 层**: 页面 View + 6 个可视化 JSON API
+- **View 层**: 页面 View + 8 个可视化 JSON API
 
 ---
 
@@ -329,8 +333,8 @@ AEDS/
 ├── Webfront/                    # [Django Web 前端]
 │   ├── config/settings.py       # Django 配置（CONN_MAX_AGE=300, LocMemCache）
 │   ├── webfront/
-│   │   ├── services/dao/        # DAO 层（statistics / airfoil / anomaly）
-│   │   ├── views.py             # 页面 View + 6 可视化 JSON API
+│   │   ├── services/dao/        # DAO 层（statistics / airfoil / anomaly / anomaly_engine）
+│   │   ├── views.py             # 页面 View + 8 可视化 JSON API
 │   │   ├── models.py            # 13 个 Django Model（managed=False）
 │   │   └── urls.py              # 全部路由注册
 │   ├── templates/webfront/      # 11 个 HTML 模板
