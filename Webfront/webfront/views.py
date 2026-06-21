@@ -286,12 +286,24 @@ def compare_airfoils(request):
 
 
 def anomaly_list(request):
-    """异常数据列表页（GET）"""
-    anomalies = airfoil_service.get_anomalies()
+    """异常数据列表页（GET，支持分页）"""
+    page = int(request.GET.get('page', 1))
+    limit = 50
+    offset = (page - 1) * limit
+    
+    anomalies = airfoil_service.get_anomalies(limit=limit, offset=offset)
+    total_count = airfoil_service.get_anomaly_count()
     detail_stats = airfoil_service.get_anomaly_detail_stats()
+    
+    total_pages = (total_count + limit - 1) // limit
+    
     return render(request, 'webfront/anomaly_list.html', {
         'anomalies': anomalies,
         'detail_stats': detail_stats,
+        'page': page,
+        'total_pages': total_pages,
+        'total_count': total_count,
+        'page_range': range(max(1, page - 2), min(total_pages, page + 2) + 1),
     })
 
 

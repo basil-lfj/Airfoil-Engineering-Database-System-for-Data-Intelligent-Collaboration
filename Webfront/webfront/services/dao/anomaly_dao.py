@@ -17,8 +17,8 @@ def get_anomaly_stats():
         return dictfetchall(cursor)
 
 
-def get_anomalies():
-    """获取异常数据列表"""
+def get_anomalies(limit=100, offset=0):
+    """获取异常数据列表（带分页）"""
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT ar.anomaly_id, ar.status, ar.details,
@@ -31,5 +31,13 @@ def get_anomalies():
             JOIN airfoil a ON a.airfoil_id = av.airfoil_id
             JOIN anomaly_rule r ON r.rule_id = ar.rule_id
             ORDER BY ar.detected_at DESC
-        """)
+            LIMIT %s OFFSET %s
+        """, [limit, offset])
         return dictfetchall(cursor)
+
+
+def get_anomaly_count():
+    """获取异常总数"""
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT count(*) FROM anomaly_record")
+        return cursor.fetchone()[0]

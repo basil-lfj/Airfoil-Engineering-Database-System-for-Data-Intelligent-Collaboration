@@ -193,13 +193,22 @@ def scan_all_performance():
                 SELECT ar.record_id, ar2.rule_code
                 FROM anomaly_record ar
                 JOIN anomaly_rule ar2 ON ar2.rule_id = ar.rule_id
-                WHERE ar.status = 'open'
             """)
             existing = set()
             for r in dictfetchall(cursor):
                 existing.add((str(r['record_id']), r['rule_code']))
 
-            for record_id, rule_code, details in all_hits:
+            for hit in all_hits:
+                # 兼容旧版的 dict 和新版的 tuple
+                if isinstance(hit, dict):
+                    record_id = str(hit['record_id'])
+                    rule_code = hit['rule_code']
+                    details = hit['details']
+                else:
+                    record_id = str(hit[0])
+                    rule_code = hit[1]
+                    details = hit[2]
+
                 if (record_id, rule_code) in existing:
                     by_rule[rule_code] += 1
                     continue

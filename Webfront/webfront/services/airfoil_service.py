@@ -6,7 +6,7 @@ from .dao import (
     get_recent_airfoils, get_all_airfoils, get_airfoil_detail,
     search_airfoils_by_name, search_airfoils_by_condition,
     compare_airfoils, get_suggested_airfoils,
-    get_anomaly_stats, get_anomalies,
+    get_anomaly_stats, get_anomalies, get_anomaly_count,
     # 异常检测引擎
     scan_all_performance, check_single_record,
     get_anomaly_detail_stats, get_anomaly_annotations,
@@ -25,7 +25,7 @@ __all__ = [
     'get_recent_airfoils', 'get_all_airfoils', 'get_airfoil_detail',
     'search_airfoils_by_name', 'search_airfoils_by_condition',
     'compare_airfoils', 'get_suggested_airfoils',
-    'get_anomaly_stats', 'get_anomalies',
+    'get_anomaly_stats', 'get_anomalies', 'get_anomaly_count',
     # 异常检测引擎
     'scan_all_performance', 'check_single_record',
     'get_anomaly_detail_stats', 'get_anomaly_annotations',

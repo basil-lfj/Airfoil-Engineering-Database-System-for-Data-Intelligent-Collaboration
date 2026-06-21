@@ -9,7 +9,7 @@
 
 <!-- ── 统计卡片 ── -->
 <div class="stat-grid">
-    <div class="stat"><div class="stat-num">{{ anomalies|length }}</div><div class="stat-label">异常记录总数</div></div>
+    <div class="stat"><div class="stat-num">{{ total_count }}</div><div class="stat-label">异常记录总数</div></div>
     <div class="stat"><div class="stat-num">
         {% for s in detail_stats.by_status %}{% if s.status == 'open' %}{{ s.cnt }}{% endif %}{% endfor %}
     </div><div class="stat-label">待确认</div></div>
@@ -62,7 +62,7 @@
     <div class="card-header">
         <h2>异常记录明细</h2>
         <div class="flex items-center gap-3">
-            <span class="count">{{ anomalies|length }} 条</span>
+            <span class="count">{{ total_count }} 条</span>
             <button class="btn btn-sm" onclick="exportTableCSV('anomalyTable', 'anomalies.csv')">导出 CSV</button>
         </div>
     </div>
@@ -102,12 +102,36 @@
             </tbody>
         </table>
     </div>
+    
+    <!-- ── 分页控制 ── -->
+    {% if total_pages > 1 %}
+    <div class="pagination flex justify-center items-center gap-2 p-4">
+        {% if page > 1 %}
+        <a href="?page=1" class="btn btn-sm btn-ghost">&laquo; 首页</a>
+        <a href="?page={{ page|add:-1 }}" class="btn btn-sm btn-ghost">上一页</a>
+        {% endif %}
+        
+        {% for p in page_range %}
+        <a href="?page={{ p }}" class="btn btn-sm {% if p == page %}btn-primary{% else %}btn-ghost{% endif %}">{{ p }}</a>
+        {% endfor %}
+        
+        {% if page < total_pages %}
+        <a href="?page={{ page|add:1 }}" class="btn btn-sm btn-ghost">下一页</a>
+        <a href="?page={{ total_pages }}" class="btn btn-sm btn-ghost">末页 &raquo;</a>
+        {% endif %}
+        <span class="text-secondary text-sm ml-2">第 {{ page }} / {{ total_pages }} 页</span>
+    </div>
+    {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
 <script>
 /* ── 全库扫描 ── */
+var isScanning = false;
 function scanAnomalies() {
+    if (isScanning) return;
+    isScanning = true;
+    
     var btn = document.getElementById('scanBtn');
     btn.disabled = true;
     btn.textContent = '扫描中…';
@@ -122,8 +146,20 @@ function scanAnomalies() {
         .catch(function(e){
             btn.textContent = '扫描失败';
             btn.disabled = false;
+            isScanning = false;
         });
 }
+
+// 统一管理图表实例
+var chartInstances = [];
+function disposeCharts() {
+    chartInstances.forEach(function(c){ c.dispose(); });
+    chartInstances = [];
+}
+
+window.addEventListener('resize', function(){
+    chartInstances.forEach(function(c){ c.resize(); });
+});
 
 /* ── 图表：按等级分布 ── */
 {% if detail_stats.by_severity %}
@@ -131,7 +167,10 @@ function scanAnomalies() {
     var data = {{ detail_stats.by_severity|safe }};
     var colors = {high: '#dc2626', medium: '#d97706', low: '#2563eb'};
     var labels = {high: '高严重度', medium: '中严重度', low: '低严重度'};
-    var c = echarts.init(document.getElementById('chart-by-severity'));
+    var dom = document.getElementById('chart-by-severity');
+    if (!dom) return;
+    var c = echarts.init(dom);
+    chartInstances.push(c);
     c.setOption({
         tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
         series: [{
@@ -152,10 +191,13 @@ function scanAnomalies() {
 (function(){
     var data = {{ detail_stats.by_rule|safe }}.filter(function(d){ return d.cnt > 0; });
     var colors = {high: '#dc2626', medium: '#d97706', low: '#2563eb'};
-    var c = echarts.init(document.getElementById('chart-by-rule'));
+    var dom = document.getElementById('chart-by-rule');
+    if (!dom) return;
+    var c = echarts.init(dom);
+    chartInstances.push(c);
     c.setOption({
         tooltip: { trigger: 'item', formatter: '{b}<br/>数量: {c} ({d}%)' },
-        legend: { bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 } },
+        legend: { bottom: 0, icon: 'circle', itemWidth: 8, itemHeight: 8, textStyle: { fontSize: 10 }, type: 'scroll' },
         series: [{
             type: 'pie', radius: ['35%','65%'],
             center: ['50%', '45%'],

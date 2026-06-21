@@ -179,11 +179,22 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_performance_record_cd_or_anomaly' AND conrelid = 'public.performance_record'::regclass) THEN
     ALTER TABLE public.performance_record ADD CONSTRAINT ck_performance_record_cd_or_anomaly CHECK (cd >= 0 OR is_anomaly);
   END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_anomaly_record_rule_perf' AND conrelid = 'public.anomaly_record'::regclass) THEN
+    ALTER TABLE public.anomaly_record ADD CONSTRAINT uq_anomaly_record_rule_perf UNIQUE (rule_id, record_id);
+  END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ck_performance_record_source' AND conrelid = 'public.performance_record'::regclass) THEN
     ALTER TABLE public.performance_record ADD CONSTRAINT ck_performance_record_source CHECK (source_type IN ('real', 'synthetic'));
   END IF;
 END
 $$;
+
+-- ── 清理由于 Bug 产生的重复异常数据 ──
+DELETE FROM anomaly_record a
+USING anomaly_record b
+WHERE a.anomaly_id > b.anomaly_id
+  AND a.rule_id = b.rule_id
+  AND a.record_id = b.record_id;
+
 
 DO $$
 BEGIN

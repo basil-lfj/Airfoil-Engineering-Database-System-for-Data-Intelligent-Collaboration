@@ -129,11 +129,10 @@ BEGIN
     FROM flagged f
     JOIN anomaly_rule r ON r.rule_code = f.rule_code AND r.is_enabled = true
     LEFT JOIN anomaly_record ar
-      ON ar.version_id = f.version_id
-      AND ar.record_id = f.record_id
+      ON ar.record_id = f.record_id
       AND ar.rule_id = r.rule_id
-      AND ar.status = 'open'
     WHERE ar.anomaly_id IS NULL
+    -- ON CONFLICT (rule_id, record_id) DO NOTHING -- 如果已建立唯一索引可开启此行
     RETURNING anomaly_id
   )
   SELECT count(*) INTO v_inserted FROM ins;
