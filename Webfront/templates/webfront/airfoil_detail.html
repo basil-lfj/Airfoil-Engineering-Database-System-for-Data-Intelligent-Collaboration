@@ -73,7 +73,7 @@
     <div class="table-wrap" style="max-height:400px;overflow-y:auto;">
         <table>
             <thead>
-                <tr><th>序号</th><th>表面</th><th>X</th><th>Y</th></tr>
+                <tr><th>序号</th><th>表面</th><th>X</th><th>Y</th><th style="width:100px;">操作</th></tr>
             </thead>
             <tbody>
                 {% for p in geometry %}
@@ -82,10 +82,49 @@
                     <td>{% if p.surface == "upper" %}<span class="tag tag-blue">上表面</span>{% else %}<span class="tag tag-amber">下表面</span>{% endif %}</td>
                     <td class="text-mono">{{ p.x|floatformat:6 }}</td>
                     <td class="text-mono">{{ p.y|floatformat:6 }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-ghost" style="color:var(--blue);padding:2px 6px;font-size:0.7rem;"
+                                onclick="showCoordEdit('{{ p.point_id }}','{% if p.surface == 'upper' %}upper{% else %}lower{% endif %}','{{ p.x|floatformat:6 }}','{{ p.y|floatformat:6 }}')">编辑</button>
+                        <button class="btn btn-sm btn-ghost" style="color:var(--red);padding:2px 6px;font-size:0.7rem;"
+                                onclick="deleteCoord('{{ p.point_id }}')">删除</button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- ════════════ Modal：编辑坐标 ════════════ -->
+<div id="coordEditModal" class="modal-overlay" style="display:none;">
+    <div class="modal" style="max-width:450px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h2>编辑坐标点</h2>
+                <button class="btn btn-sm" onclick="hideModal('coordEditModal')">&times;</button>
+            </div>
+            <input type="hidden" id="ce_point_id">
+            <div class="form-group">
+                <label class="form-label">表面</label>
+                <select id="ce_surface" class="input">
+                    <option value="upper">上表面</option>
+                    <option value="lower">下表面</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">X 坐标</label>
+                <input type="number" id="ce_x" class="input" step="0.000001" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Y 坐标</label>
+                <input type="number" id="ce_y" class="input" step="0.000001" required>
+            </div>
+            <div id="coordEditError" class="alert" style="display:none;border-color:var(--red);color:var(--red);background:var(--red-bg);"></div>
+            <div class="flex items-center gap-3" style="margin-top:var(--space-4);">
+                <button class="btn btn-primary" onclick="submitCoordEdit()">确认修改</button>
+                <button class="btn" onclick="hideModal('coordEditModal')">取消</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -101,7 +140,7 @@
     <div class="table-wrap" style="max-height:500px;overflow-y:auto;">
         <table>
             <thead>
-                <tr><th>攻角 (°)</th><th>雷诺数</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th style="width:80px;">操作</th></tr>
+                <tr><th>攻角 (°)</th><th>雷诺数</th><th>Cl</th><th>Cd</th><th>升阻比</th><th>来源</th><th>异常</th><th style="width:110px;">操作</th></tr>
             </thead>
             <tbody>
                 {% for p in performances %}
@@ -114,6 +153,8 @@
                     <td><span class="tag {% if p.source_type == 'real' %}tag-green{% else %}tag-blue{% endif %}">{{ p.source_type }}</span></td>
                     <td>{% if p.is_anomaly %}<span class="tag tag-red">异常</span>{% else %}<span class="tag tag-gray">正常</span>{% endif %}</td>
                     <td>
+                        <button class="btn btn-sm btn-ghost" style="color:var(--blue);padding:2px 6px;font-size:0.7rem;"
+                                onclick="showPerfEdit('{{ p.record_id }}','{{ p.alpha_deg }}','{{ p.reynolds_number }}','{{ p.cl }}','{{ p.cd }}','{{ p.source_type }}')">编辑</button>
                         <button class="btn btn-sm btn-ghost" style="color:var(--red);padding:2px 6px;font-size:0.7rem;"
                                 onclick="deletePerf('{{ p.record_id }}')">删除</button>
                     </td>
@@ -219,6 +260,44 @@
             <div class="flex items-center gap-3" style="margin-top:var(--space-4);">
                 <button class="btn btn-primary" onclick="submitPerf()">确认录入</button>
                 <button class="btn" onclick="hideModal('perfModal')">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════ Modal：编辑性能 ════════════ -->
+<div id="perfEditModal" class="modal-overlay" style="display:none;">
+    <div class="modal" style="max-width:450px;">
+        <div class="card" style="margin-bottom:0;">
+            <div class="card-header">
+                <h2>编辑性能数据</h2>
+                <button class="btn btn-sm" onclick="hideModal('perfEditModal')">&times;</button>
+            </div>
+            <input type="hidden" id="pe_record_id">
+            <p style="font-size:var(--text-sm);color:var(--text-secondary);margin-bottom:var(--space-3);">
+                工况：<span id="pe_cond_label" style="color:var(--text-primary);font-weight:500;">—</span>（工况不可变，需新建记录）
+            </p>
+            <div class="form-group">
+                <label class="form-label">升力系数 Cl</label>
+                <input type="number" id="pe_cl" class="input" step="0.001" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">阻力系数 Cd</label>
+                <input type="number" id="pe_cd" class="input" step="0.00001" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">数据来源</label>
+                <select id="pe_source" class="input">
+                    <option value="experimental">实验</option>
+                    <option value="simulation">仿真</option>
+                    <option value="literature">文献</option>
+                    <option value="real">实测</option>
+                </select>
+            </div>
+            <div id="perfEditError" class="alert" style="display:none;border-color:var(--red);color:var(--red);background:var(--red-bg);margin-top:var(--space-3);"></div>
+            <div class="flex items-center gap-3" style="margin-top:var(--space-4);">
+                <button class="btn btn-primary" onclick="submitPerfEdit()">确认修改</button>
+                <button class="btn" onclick="hideModal('perfEditModal')">取消</button>
             </div>
         </div>
     </div>
@@ -408,6 +487,92 @@ function deletePerf(recordId) {
             if (d.success) { showAlert('性能记录已删除', 'success'); setTimeout(function(){ location.reload(); }, 800); }
             else { showAlert(d.error, 'error'); }
         });
+}
+
+/* ══════ 坐标编辑 ══════ */
+function showCoordEdit(pointId, surface, x, y) {
+    document.getElementById('ce_point_id').value = pointId;
+    document.getElementById('ce_surface').value = surface;
+    document.getElementById('ce_x').value = x;
+    document.getElementById('ce_y').value = y;
+    document.getElementById('coordEditError').style.display = 'none';
+    showModal('coordEditModal');
+}
+function submitCoordEdit() {
+    var pointId = document.getElementById('ce_point_id').value;
+    var surface = document.getElementById('ce_surface').value;
+    var x = document.getElementById('ce_x').value;
+    var y = document.getElementById('ce_y').value;
+    var errDiv = document.getElementById('coordEditError');
+    var form = new FormData();
+    form.append('action', 'update_coordinate');
+    form.append('point_id', pointId);
+    form.append('surface', surface);
+    form.append('x', x);
+    form.append('y', y);
+    form.append('csrfmiddlewaretoken', getCSRF());
+    fetch(window.location.href, { method: 'POST', body: form })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if (d.success) {
+                showAlert('坐标点已更新', 'success');
+                hideModal('coordEditModal');
+                setTimeout(function(){ location.reload(); }, 800);
+            } else {
+                errDiv.textContent = d.error; errDiv.style.display = '';
+            }
+        })
+        .catch(function(e){ errDiv.textContent = '请求失败: ' + e.message; errDiv.style.display = ''; });
+}
+function deleteCoord(pointId) {
+    if (!confirm('确定要删除此坐标点吗？')) return;
+    var form = new FormData();
+    form.append('action', 'delete_coordinates');
+    form.append('point_ids', JSON.stringify([pointId]));
+    form.append('csrfmiddlewaretoken', getCSRF());
+    fetch(window.location.href, { method: 'POST', body: form })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if (d.success) { showAlert('坐标点已删除', 'success'); setTimeout(function(){ location.reload(); }, 800); }
+            else { showAlert(d.error, 'error'); }
+        });
+}
+
+/* ══════ 性能编辑 ══════ */
+function showPerfEdit(recordId, alpha, re, cl, cd, source) {
+    document.getElementById('pe_record_id').value = recordId;
+    document.getElementById('pe_cond_label').textContent = '\u03B1=' + alpha + '\u00B0, Re=' + re;
+    document.getElementById('pe_cl').value = cl;
+    document.getElementById('pe_cd').value = cd;
+    document.getElementById('pe_source').value = source;
+    document.getElementById('perfEditError').style.display = 'none';
+    showModal('perfEditModal');
+}
+function submitPerfEdit() {
+    var recordId = document.getElementById('pe_record_id').value;
+    var cl = document.getElementById('pe_cl').value;
+    var cd = document.getElementById('pe_cd').value;
+    var source = document.getElementById('pe_source').value;
+    var errDiv = document.getElementById('perfEditError');
+    var form = new FormData();
+    form.append('action', 'update_performance');
+    form.append('record_id', recordId);
+    form.append('cl', cl);
+    form.append('cd', cd);
+    form.append('source_type', source);
+    form.append('csrfmiddlewaretoken', getCSRF());
+    fetch(window.location.href, { method: 'POST', body: form })
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            if (d.success) {
+                showAlert('性能数据已更新', 'success');
+                hideModal('perfEditModal');
+                setTimeout(function(){ location.reload(); }, 800);
+            } else {
+                errDiv.textContent = d.error; errDiv.style.display = '';
+            }
+        })
+        .catch(function(e){ errDiv.textContent = '请求失败: ' + e.message; errDiv.style.display = ''; });
 }
 </script>
 {% endblock %}

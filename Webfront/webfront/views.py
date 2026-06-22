@@ -157,6 +157,19 @@ def airfoil_detail(request, code):
             result = airfoil_service.delete_coordinate_points(point_ids)
             return JsonResponse(result)
 
+        if action == 'update_coordinate':
+            point_id = request.POST.get('point_id', '').strip()
+            surface = request.POST.get('surface', '').strip()
+            try:
+                x = float(request.POST.get('x', 0))
+                y = float(request.POST.get('y', 0))
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'error': '坐标值格式错误'})
+            result = airfoil_service.update_coordinate_point(
+                point_id, x=x, y=y, surface=surface
+            )
+            return JsonResponse(result)
+
         # ── 性能数据管理 ──
         if action == 'create_performance':
             try:
@@ -175,6 +188,19 @@ def airfoil_detail(request, code):
         if action == 'delete_performance':
             record_id = request.POST.get('record_id', '').strip()
             result = airfoil_service.delete_performance_record(record_id)
+            return JsonResponse(result)
+
+        if action == 'update_performance':
+            record_id = request.POST.get('record_id', '').strip()
+            try:
+                cl = float(request.POST.get('cl', 0))
+                cd = float(request.POST.get('cd', 0))
+            except (ValueError, TypeError):
+                return JsonResponse({'success': False, 'error': '数值格式错误'})
+            source_type = request.POST.get('source_type', '').strip()
+            result = airfoil_service.update_performance_record(
+                record_id, cl=cl, cd=cd, source_type=source_type
+            )
             return JsonResponse(result)
 
         return JsonResponse({'success': False, 'error': '未知操作'})
